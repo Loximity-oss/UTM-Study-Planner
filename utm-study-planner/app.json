@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "utm-study-planner",
+    "slug": "utm-study-planner",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "utm-study-planner"
+}
