@@ -12,7 +12,7 @@ function WelcomeScreen(props) {
 
 const styles = StyleSheet.create({
     container: {
-        backgrounColor: '#aaa',
+        backgroundColor: '#aaa',
         color: 'red',
         paddingTop: 14
     }
