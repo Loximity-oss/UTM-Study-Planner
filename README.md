@@ -1,5 +1,5 @@
 
-![Alt text](https://github.com/Loximity-oss/UTM-Study-Planner/tree/main/src/assets/banner.png "Banner")
+![Alt text](https://github.com/Loximity-oss/UTM-Study-Planner/assets/banner.png "Banner")
 
 # Universiti Teknologi Malaysia Study Planner
 Universiti Teknologi Malaysia (UTM) Direct entry students usually faces with study planning problems. Ranging from timetable issues, timetable accessibility, conflicting information and prerequisite subject being different time to time. This system aims to automate these 
