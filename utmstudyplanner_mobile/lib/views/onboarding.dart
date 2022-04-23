@@ -13,46 +13,34 @@ class IntroductionPage extends StatelessWidget {
     final box = Hive.box('');
 
     return Scaffold(
+      appBar: AppBar(backgroundColor: const Color.fromRGBO(93, 6, 29, 1.0), title: const Text('Welcome')),
       body: IntroductionScreen(
+        globalBackgroundColor: Colors.white,
         pages: [
           PageViewModel(
-            title: 'Title of 1st Page', //Basic String Title
-            body: 'Body of 1st Page', //Basic String Body
-            decoration:
-            const PageDecoration(), //Page decoration Contain all page customizations
+            title: "Stay organized",
+            body: "This application intends to automate your university life planning easier.",
             image: Center(
               child: Image.asset(
                   'assets/onboarding/onboarding-1.png'),
-            ), //If you want to you can also wrap around Alignment
-            reverse: false, //If widget Order is reverse - body before image
-            footer: const Text('Footer'), //You can add button here for instance
+            ),
           ),
           PageViewModel(
-
-            title: 'Title of 1st Page', //Basic String Title
-            body: 'Body of 1st Page', //Basic String Body
-            decoration:
-            const PageDecoration(), //Page decoration Contain all page customizations
+            title: "Timetable syncing with faculty",
+            body: "Avoid last minute changes by academic staff by having to sort your timetable.",
             image: Center(
               child: Image.asset(
                   'assets/onboarding/onboarding-2.png'),
-            ), //If you want to you can also wrap around Alignment
-            reverse: false, //If widget Order is reverse - body before image
-            footer: const Text('Footer'), //You can add button here for instance
+            ),
           ),
           PageViewModel(
-            title: 'Title of 1st Page', //Basic String Title
-            body: 'Body of 1st Page', //Basic String Body
-            decoration:
-            const PageDecoration(), //Page decoration Contain all page customizations
+            title: "Available in Mobile and Web",
+            body: "Access this system anywhere you wish.",
             image: Center(
               child: Image.asset(
                   'assets/onboarding/onboarding-3.png'),
-            ), //If you want to you can also wrap around Alignment
-            reverse: false, //If widget Order is reverse - body before image
-            footer: const Text('Footer'), //You can add button here for instance
+            ),
           ),
-
         ],
         onDone: () {
           box.put('introduction', false);
@@ -64,13 +52,13 @@ class IntroductionPage extends StatelessWidget {
             ),
           );
         },
-        skip: const Icon(Icons.skip_next),
-        next: const Icon(Icons.forward),
-        done: const Text("Done", style: TextStyle(fontWeight: FontWeight.w600)),
+        skip: const Icon(Icons.skip_next, color: Color.fromRGBO(93, 6, 29, 1.0)),
+        next: const Icon(Icons.forward, color: Color.fromRGBO(93, 6, 29, 1.0)),
+        done: const Text("Done", style: TextStyle(fontWeight: FontWeight.w600, color: Color.fromRGBO(93, 6, 29, 1.0))),
         dotsDecorator: DotsDecorator(
             size: const Size.square(10.0),
             activeSize: const Size(20.0, 10.0),
-            activeColor: Colors.blue,
+            activeColor: const Color.fromRGBO(93, 6, 29, 1.0),
             color: Colors.black26,
             spacing: const EdgeInsets.symmetric(horizontal: 3.0),
             activeShape: RoundedRectangleBorder(

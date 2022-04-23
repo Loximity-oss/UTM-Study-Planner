@@ -8,7 +8,6 @@ class loginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final box = Hive.box('');
-    box.put('introduction', true);
     bool firstTimeState = box.get('introduction') ?? true;
     return firstTimeState
         ? const IntroductionPage()
