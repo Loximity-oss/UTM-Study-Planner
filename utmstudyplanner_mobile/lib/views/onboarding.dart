@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:utmstudyplanner_mobile/views/login.dart';
+import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
 
 import 'login.dart';
 
@@ -47,7 +47,7 @@ class IntroductionPage extends StatelessWidget {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (BuildContext context) {
-                return const loginPage();
+                return homepage();
               },
             ),
           );

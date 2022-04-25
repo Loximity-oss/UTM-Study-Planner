@@ -4,6 +4,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:utmstudyplanner_mobile/views/onboarding.dart';
 import 'dart:async';
 import 'views/login.dart';
+import 'views/home/homescreen.dart';
 
 void main() async{
   await Hive.initFlutter();
@@ -23,8 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(seconds: 5),
             ()=>Navigator.pushReplacement(context,
             MaterialPageRoute(builder:
-                (context) =>
-                loginPage()
+                (context) => loginPage()
             )
         )
     );
