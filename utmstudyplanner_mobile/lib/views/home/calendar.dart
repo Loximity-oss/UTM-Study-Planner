@@ -66,11 +66,11 @@ class _CalendarPageState extends State<CalendarPage> {
     ),
   );
 
-  final EventList<Event> _markedDateMap = EventList<Event>(
+  final EventList<Event> _markedDateMap = EventList<Event>( //DateTime will not be relevant as they use _markedDateMap instead
     events: {
-      DateTime(2021, 3, 10): [
+      DateTime(2022, 4, 10): [
         Event(
-          date: DateTime(2021, 3, 10),
+          date: DateTime(2022, 4, 27),
           title: 'Event 1',
           icon: _eventIcon,
           dot: Container(
@@ -106,11 +106,10 @@ class _CalendarPageState extends State<CalendarPage> {
         ));
 
     _markedDateMap.add(
-        DateTime(2021, 10, 10),
-        Event(
-          date: DateTime(2021, 10, 10),
-          title: 'Event 4',
-          icon: _eventIcon,
+        DateTime(2022, 4, 30),
+        Event(date: DateTime(2022, 4, 30),
+        title: 'Exam Computer Network',
+        icon: _eventIcon,
         ));
 
     _markedDateMap.addAll(DateTime(2021, 10, 11), [
