@@ -1,6 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+<<<<<<< Updated upstream
+=======
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
+import '../login.dart';
+>>>>>>> Stashed changes
 
 
 //todo sharedpreferences, user/password storage.
@@ -250,6 +256,7 @@ class homepage extends StatelessWidget {
                         ),
                       ],
                     ),
+<<<<<<< Updated upstream
                   ),
 
                   Container( //table container
@@ -266,6 +273,32 @@ class homepage extends StatelessWidget {
                           ),
                             DataColumn(
                             label: Text('Subject Code'),
+=======
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Calendar()),
+                        );
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.info,
+                                size: 50, color: Color.fromARGB(255, 65, 72, 101)),
+                            title: Text(
+                              'About Application',
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 65, 72, 101),
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text('Application Information',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 65, 72, 101),
+                                )),
+>>>>>>> Stashed changes
                           ),
                           ],
                           rows: [

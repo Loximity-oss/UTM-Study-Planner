@@ -33,7 +33,11 @@ dependencies:
   hive_flutter: ^1.1.0
   introduction_screen: ^3.0.2
   font_awesome_flutter: 10.1.0
+<<<<<<< Updated upstream
   data_tables: 1.4.0
+=======
+  flutter_calendar_carousel: ^2.1.0
+>>>>>>> Stashed changes
 
 dev_dependencies:
   flutter_test:
