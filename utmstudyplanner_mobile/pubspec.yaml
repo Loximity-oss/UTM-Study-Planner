@@ -60,6 +60,7 @@ flutter:
   assets:
      - assets/splash.png
      - assets/onboarding/
+     - assets/signup/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
 
-import 'login.dart';
+import 'login/login.dart';
 
 class IntroductionPage extends StatelessWidget {
   const IntroductionPage({Key? key}) : super(key: key);

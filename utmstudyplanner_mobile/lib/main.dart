@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:utmstudyplanner_mobile/views/onboarding.dart';
 import 'dart:async';
-import 'views/login.dart';
+import 'views/login/login.dart';
 import 'views/home/homescreen.dart';
 
 void main() async{
