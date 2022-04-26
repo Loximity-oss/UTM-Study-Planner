@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
-import 'package:utmstudyplanner_mobile/views/login/login.dart';
+import 'package:utmstudyplanner_mobile/views/login.dart';
 
 class homepage extends StatelessWidget {
   @override
