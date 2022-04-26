@@ -92,13 +92,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.3"
-  data_tables:
-    dependency: "direct main"
-    description:
-      name: data_tables
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.4.0"
   dots_indicator:
     dependency: transitive
     description:
