@@ -44,7 +44,7 @@ class homepage extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: FaIcon(FontAwesomeIcons.gear, color: Colors.black),
+              leading: const FaIcon(FontAwesomeIcons.bell, color: Colors.black),
               title: const Text('Notifications Settings'),
               onTap: () {
                 Navigator.pop(context);
@@ -148,13 +148,13 @@ class homepage extends StatelessWidget {
                           height: 100,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            image: DecorationImage(image: AssetImage('assets/Profile/default.jpg')),
+                            image: DecorationImage(image: AssetImage('assets/Profile/default.png')),
                           ),
                         ),
                         SizedBox(height: 10),
-                        Container(child: Text('DANIAL',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), )), //TODO: link with backend
-                        Container(child: Text('B21EC0006',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
-                        Container(child: Text('3/SERCH',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
+                        Container(child: Text('User',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), )), //TODO: link with backend
+                        Container(child: Text('B21ECXXXX',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
+                        Container(child: Text('3/SECJH',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
 
                       ],
                     ),
