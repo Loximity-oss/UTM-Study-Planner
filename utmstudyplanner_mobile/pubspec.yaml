@@ -34,6 +34,7 @@ dependencies:
   introduction_screen: ^3.0.2
   font_awesome_flutter: 10.1.0
   flutter_calendar_carousel: ^2.1.0
+  email_validator: ^2.0.1
   http: 0.13.4
 
 dev_dependencies:
