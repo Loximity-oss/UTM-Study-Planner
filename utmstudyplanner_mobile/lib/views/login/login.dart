@@ -17,6 +17,7 @@ class loginPage extends StatefulWidget {
 
 class _loginPageState extends State<loginPage> {
   @override
+  final box = Hive.box('');
   final TextEditingController emailInput = TextEditingController();
   final TextEditingController passwordInput = TextEditingController();
   final _formLoginKey = GlobalKey<FormState>();
@@ -45,6 +46,8 @@ class _loginPageState extends State<loginPage> {
     // If the Response Message is Matched.
     if(message == "True")
     {
+      box.put('email', email);
+      box.put('password', password);
       // Hiding the CircularProgressIndicator.
       setState(() {
         visible = false;

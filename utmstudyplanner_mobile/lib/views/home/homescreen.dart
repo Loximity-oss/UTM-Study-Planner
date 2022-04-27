@@ -4,8 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/login/login.dart';
 import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
+import 'package:utmstudyplanner_mobile/views/notifications/TestNotifyScreen.dart';
 
-//todo sharedpreferences, user/password storage.
 
 class homepage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _homepageKey = GlobalKey<ScaffoldState>();
@@ -37,8 +37,19 @@ class homepage extends StatelessWidget {
               leading: FaIcon(FontAwesomeIcons.calendar, color: Colors.black),
               title: const Text('Calendar'),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => CalendarPage(title: 'Your Calendar')
+                    ));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.gear, color: Colors.black),
+              title: const Text('Notifications Settings'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => TestNotifyScreen()
                     ));
               },
             ),
