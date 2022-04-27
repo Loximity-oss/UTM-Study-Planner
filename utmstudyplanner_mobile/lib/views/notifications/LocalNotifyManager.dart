@@ -27,7 +27,7 @@ class LocalNotifyManager {
   }
 
   initializePlatform() {
-    var initSettingAndroid = AndroidInitializationSettings('app_icon');
+    var initSettingAndroid = AndroidInitializationSettings('logo');
     var initSettingIOS = IOSInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
@@ -57,12 +57,13 @@ class LocalNotifyManager {
 
   Future showNotification() async {
     var androidChannel = AndroidNotificationDetails(
-        'CHANNEL_ID', 'CHANNEL_NAME',
-        channelDescription: 'CHANNEL_DESCRIPTION',
-        importance: Importance.max,
-        priority: Priority.high,
-        playSound: true,
-        sound: RawResourceAndroidNotificationSound('notification_sound'));
+      'CHANNEL_ID',
+      'CHANNEL_NAME',
+      channelDescription: 'CHANNEL_DESCRIPTION',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+    );
 
     var iosChannel = IOSNotificationDetails();
     var platformChannel =
@@ -76,12 +77,13 @@ class LocalNotifyManager {
   Future scheduleNotification() async {
     var scheduleNotificationDateTime = DateTime.now().add(Duration(seconds: 5));
     var androidChannel = AndroidNotificationDetails(
-        'CHANNEL_ID', 'CHANNEL_NAME',
-        channelDescription: 'CHANNEL_DESCRIPTION',
-        importance: Importance.max,
-        priority: Priority.high,
-        playSound: true,
-        sound: RawResourceAndroidNotificationSound('notification_sound'));
+      'CHANNEL_ID',
+      'CHANNEL_NAME',
+      channelDescription: 'CHANNEL_DESCRIPTION',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+    );
 
     var iosChannel = IOSNotificationDetails();
     var platformChannel =

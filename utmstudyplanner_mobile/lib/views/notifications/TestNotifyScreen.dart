@@ -38,8 +38,8 @@ class __TestNotifyScreenState extends State<TestNotifyScreen> {
         body: Center(
             child: TextButton(
                 onPressed: () async {
-                  // await localNotifyManager.showNotification();
-                  await localNotifyManager.scheduleNotification();
+                  await localNotifyManager.showNotification();
+                  // await localNotifyManager.scheduleNotification();
                 },
                 child: Text("Send Notification"))));
   }
