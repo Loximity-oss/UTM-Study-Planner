@@ -3,7 +3,11 @@ import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
     show CalendarCarousel;
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart' show DateFormat;
+import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
+
+import '../login/login.dart';
 
 class Calendar extends StatelessWidget {
   const Calendar({Key? key}) : super(key: key);
@@ -11,22 +15,79 @@ class Calendar extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'UTM Study Planner Calendar V2',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.red,
-        //primaryColor: const Color.fromARGB(255, 93, 6, 29),
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 255, 249, 235),
+      appBar: AppBar(backgroundColor: const Color.fromARGB(255, 93, 6, 29)),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 93, 6, 29),
+              ),
+              child: Text('UTM Study Planner', style: TextStyle(color: Colors.white)),
+            ),
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.house, color: Colors.black),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => homepage()
+                ));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.calendar, color: Colors.black),
+              title: const Text('Calendar'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.gear, color: Colors.black),
+              title: const Text('Settings'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            Container(
+              child: Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: Column(
+                    children: [
+                      Divider(),
+                      ListTile(
+                          leading: FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, color: Colors.black),
+                          title: const Text('Logout'),
+                          onTap: () => showDialog(context: context, builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Logout'),
+                            content: const Text('Would you like to log out?'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => loginPage()),
+                                ),
+                                child: const Text('Yes'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, 'No'),
+                                child: const Text('No'),
+                              ),
+                            ],
+                          ))
+                      ),
+                    ],
+                  )
+              ),
+            ),
+          ],
+        ),
       ),
-      home: const CalendarPage(
-          title: 'UTM Study Planner Calendar'),
+      body: const CalendarPage(title: 'Calendar'),
     );
   }
 }

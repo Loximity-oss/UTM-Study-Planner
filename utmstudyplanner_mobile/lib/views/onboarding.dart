@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
 
 import 'login/login.dart';
 
@@ -13,7 +13,8 @@ class IntroductionPage extends StatelessWidget {
     final box = Hive.box('');
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: const Color.fromRGBO(93, 6, 29, 1.0), title: const Text('Welcome')),
+
+      appBar: AppBar(backgroundColor: Colors.white, elevation: 0,),
       body: IntroductionScreen(
         globalBackgroundColor: Colors.white,
         pages: [
@@ -47,7 +48,7 @@ class IntroductionPage extends StatelessWidget {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (BuildContext context) {
-                return homepage();
+                return loginPage();
               },
             ),
           );

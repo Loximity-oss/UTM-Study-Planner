@@ -114,7 +114,7 @@ class _loginPageState extends State<loginPage> {
                       key: _formLoginKey,
                       child: Column(
                         children:  <Widget>[
-                          TextFormField(
+                          TextFormField(controller: emailInput,
                             style: const TextStyle(fontSize: 14),
                             textInputAction: TextInputAction.next,
                             autovalidateMode: AutovalidateMode.onUserInteraction,

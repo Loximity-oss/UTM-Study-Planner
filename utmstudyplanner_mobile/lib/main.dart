@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -5,6 +7,9 @@ import 'package:utmstudyplanner_mobile/views/onboarding.dart';
 import 'dart:async';
 import 'views/login/login.dart';
 import 'views/home/homescreen.dart';
+
+import 'package:http/http.dart' as http;
+
 
 void main() async{
   await Hive.initFlutter();
@@ -18,16 +23,51 @@ class SplashScreen extends StatefulWidget {
 }
 class _SplashScreenState extends State<SplashScreen> {
 
+  void autoLogIn() async{
+    final box = Hive.box('');
+    String email, password;
+    email = box.get('email');
+    password = box.get('password');
+    if(email.isNotEmpty && password.isNotEmpty){
+      // SERVER LOGIN API URL
+      var url = Uri.parse('http://192.168.68.104/login.php');
+      // Store all data with Param Name.
+      var data = {'email': email, 'password' : password};
+      // Starting Web API Call.
+      var response = await http.post(
+          url,
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(data)
+      );
+      // Getting Server response into variable.
+      var message = jsonDecode(response.body);
+      if(message == "True") {
+        Timer(const Duration(seconds: 5),
+                ()=>Navigator.pushReplacement(context,
+                MaterialPageRoute(builder:
+                    (context) => homepage()
+                )
+            )
+        );
+      } else {
+        box.put('email','');
+        box.put('password','');
+      }
+    } else {
+      Timer(const Duration(seconds: 5),
+              ()=>Navigator.pushReplacement(context,
+              MaterialPageRoute(builder:
+                  (context) => loginPage()
+              )
+          )
+      );
+    }
+  }
+
   @override
   void initState()  {
     super.initState();
-    Timer(const Duration(seconds: 5),
-            ()=>Navigator.pushReplacement(context,
-            MaterialPageRoute(builder:
-                (context) => loginPage()
-            )
-        )
-    );
+    autoLogIn();
   }
   @override
   Widget build(BuildContext context) {

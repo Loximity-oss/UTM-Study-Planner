@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/login/login.dart';
 import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
 
@@ -8,6 +9,8 @@ import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
 
 class homepage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _homepageKey = GlobalKey<ScaffoldState>();
+  final box = Hive.box('');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,8 +37,9 @@ class homepage extends StatelessWidget {
               leading: FaIcon(FontAwesomeIcons.calendar, color: Colors.black),
               title: const Text('Calendar'),
               onTap: () {
-                // Update the state of the app.
-                // ...
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CalendarPage(title: 'Your Calendar')
+                    ));
               },
             ),
             ListTile(
@@ -60,9 +64,13 @@ class homepage extends StatelessWidget {
                             content: const Text('Would you like to log out?'),
                             actions: <Widget>[
                               TextButton(
-                                onPressed: () => Navigator.push(context, //todo add sharedprefences.
-                                  MaterialPageRoute(builder: (context) => loginPage()),
-                                ),
+                                onPressed: () {
+                                  box.put('username', '');
+                                  box.put('password', '');
+                                  Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => loginPage()),
+                                  );
+                                },
                                 child: const Text('Yes'),
                               ),
                               TextButton(
