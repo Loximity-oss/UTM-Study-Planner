@@ -36,6 +36,8 @@ dependencies:
   flutter_calendar_carousel: ^2.1.0
   email_validator: ^2.0.1
   http: 0.13.4
+  flutter_local_notifications: ^9.4.1
+  rxdart: ^0.27.3
 
 dev_dependencies:
   flutter_test:
