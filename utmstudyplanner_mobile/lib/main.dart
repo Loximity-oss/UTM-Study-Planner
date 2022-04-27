@@ -22,12 +22,12 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 class _SplashScreenState extends State<SplashScreen> {
-
+  final box = Hive.box('');
   void autoLogIn() async{
-    final box = Hive.box('');
     String email, password;
     email = box.get('email');
     password = box.get('password');
+
     if(email.isNotEmpty && password.isNotEmpty){
       // SERVER LOGIN API URL
       var url = Uri.parse('http://192.168.68.104/login.php');
@@ -67,7 +67,19 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState()  {
     super.initState();
-    autoLogIn();
+    bool firstTimeState = box.get('introduction') ?? true;
+    print(firstTimeState);
+    if(firstTimeState){
+      Timer(const Duration(seconds: 5),
+              ()=>Navigator.pushReplacement(context,
+              MaterialPageRoute(builder:
+                  (context) => IntroductionPage()
+              )
+          )
+      );
+    } else {
+      autoLogIn();
+    }
   }
   @override
   Widget build(BuildContext context) {

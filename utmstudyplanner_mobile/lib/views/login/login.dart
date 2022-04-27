@@ -88,11 +88,8 @@ class _loginPageState extends State<loginPage> {
 
   Widget build(BuildContext context) {
 
-    final box = Hive.box('');
-    bool firstTimeState = box.get('introduction') ?? true;
-    return firstTimeState
-        ? const IntroductionPage()
-        : Scaffold(
+
+    return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 249, 235),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(top: 120, bottom: 100),
