@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/register.dart';
 
+import '../../server/conn.dart';
 import '../home/homescreen.dart';
 import '../onboarding.dart';
 import 'package:http/http.dart' as http;
@@ -31,46 +33,45 @@ class _loginPageState extends State<loginPage> {
     // Getting value from Controller
     String email = emailInput.text;
     String password = passwordInput.text;
-    // SERVER LOGIN API URL
-    var url = Uri.parse('http://192.168.68.104/login.php');
-    // Store all data with Param Name.
-    var data = {'email': email, 'password' : password};
-    // Starting Web API Call.
-    var response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(data)
-    );
-    // Getting Server response into variable.
-    var message = jsonDecode(response.body);
-    // If the Response Message is Matched.
-    if(message == "True")
-    {
-      box.put('email', email);
-      box.put('password', password);
-      // Hiding the CircularProgressIndicator.
-      setState(() {
-        visible = false;
-      });
 
-      // Navigate to Profile Screen & Sending Email to Next Screen.
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => homepage())
-      );
-    }else{
-      // If Email or Password did not Matched.
-      // Hiding the CircularProgressIndicator.
-      setState(() {
-        visible = false;
+    try{
+      var db = new Mysql();
+      db.getConnection().then((conn) async {
+        conn.query("SELECT * FROM user WHERE email = ? AND password = ?", [email, password]).then((results) {
+          if(results.length == 1){
+            box.put('email',email);
+            box.put('password',password);
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => homepage())
+            );
+          } else {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('e'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        });
+        conn.close();
       });
-
-      // Showing Alert Dialog with Response JSON Message.
+    }catch(e){
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(message),
+            title: Text(e.toString()),
             actions: <Widget>[
               FlatButton(
                 child: Text("OK"),
@@ -83,6 +84,8 @@ class _loginPageState extends State<loginPage> {
         },
       );
     }
+
+
   }
 
 
