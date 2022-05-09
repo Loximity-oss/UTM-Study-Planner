@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/register.dart';
 
+import '../../server/conn.dart';
 import '../home/homescreen.dart';
 import '../onboarding.dart';
 import 'package:http/http.dart' as http;
@@ -24,56 +26,41 @@ class _loginPageState extends State<loginPage> {
   bool visible = false;
 
   Future userLogin() async{
-  // Showing CircularProgressIndicator.
+
     setState(() {
-      visible = true ;
+      visible = true;
+
     });
     // Getting value from Controller
     String email = emailInput.text;
     String password = passwordInput.text;
-    // SERVER LOGIN API URL
-    var url = Uri.parse('http://192.168.68.104/login.php');
-    // Store all data with Param Name.
-    var data = {'email': email, 'password' : password};
-    // Starting Web API Call.
-    var response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(data)
-    );
-    // Getting Server response into variable.
-    var message = jsonDecode(response.body);
-    // If the Response Message is Matched.
-    if(message == "True")
-    {
+
+    //TODO implement conn checking
+    var db = Mysql();
+    String query = 'SELECT * FROM `users` WHERE `email` = "'+ email +'" AND password = "' + password + '"';
+    var result = await db.execQuery(query);
+    if(result.numOfRows == 1){
       box.put('email', email);
       box.put('password', password);
-      // Hiding the CircularProgressIndicator.
-      setState(() {
-        visible = false;
-      });
-
-      // Navigate to Profile Screen & Sending Email to Next Screen.
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => homepage())
+      Timer(const Duration(seconds: 5),
+              ()=>Navigator.pushReplacement(context,
+              MaterialPageRoute(builder:
+                  (context) => homepage()
+              )
+          )
       );
-    }else{
-      // If Email or Password did not Matched.
-      // Hiding the CircularProgressIndicator.
+    } else {
       setState(() {
-        visible = false;
+        visible = false ;
       });
-
-      // Showing Alert Dialog with Response JSON Message.
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(message),
+            title: const Text('Username or Password is incorrect.'),
             actions: <Widget>[
               FlatButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -87,8 +74,6 @@ class _loginPageState extends State<loginPage> {
 
 
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 249, 235),
       body: SingleChildScrollView(

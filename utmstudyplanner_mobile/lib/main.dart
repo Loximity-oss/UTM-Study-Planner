@@ -1,16 +1,15 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
-import 'package:utmstudyplanner_mobile/views/home/calendarv2.dart';
 import 'package:utmstudyplanner_mobile/views/onboarding.dart';
 import 'dart:async';
+
+import 'package:utmstudyplanner_mobile/server/conn.dart';
 import 'views/login/login.dart';
 import 'views/home/homescreen.dart';
 
-import 'package:http/http.dart' as http;
+
 
 
 void main() async{
@@ -25,25 +24,22 @@ class SplashScreen extends StatefulWidget {
 }
 class _SplashScreenState extends State<SplashScreen> {
   final box = Hive.box('');
-  void autoLogIn() async{
-    String email, password;
-    email = box.get('email');
-    password = box.get('password');
 
-    if(email.isNotEmpty && password.isNotEmpty){
-      // SERVER LOGIN API URL
-      var url = Uri.parse('http://192.168.68.104/login.php');
-      // Store all data with Param Name.
-      var data = {'email': email, 'password' : password};
-      // Starting Web API Call.
-      var response = await http.post(
-          url,
-          headers: {"Content-Type": "application/json"},
-          body: json.encode(data)
-      );
-      // Getting Server response into variable.
-      var message = jsonDecode(response.body);
-      if(message == "True") {
+  void autoLogIn() async{
+    // get Stored Usernames
+    String a = box.get('email');
+    String b = box.get('password');
+
+
+    //check if cleared.
+    //TODO corruption check
+    if(a.isNotEmpty && b.isNotEmpty){
+      var db = Mysql();
+      String query = 'SELECT * FROM `users` WHERE `email` = "'+ a +'" AND password = "' + b + '"';
+      var result = await db.execQuery(query);
+
+      //todo shorten
+      if(result.numOfRows == 1){
         Timer(const Duration(seconds: 5),
                 ()=>Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
@@ -52,14 +48,23 @@ class _SplashScreenState extends State<SplashScreen> {
             )
         );
       } else {
-        box.put('email','');
-        box.put('password','');
+        box.put('email', '');
+        box.put('password', '');
+        Timer(const Duration(seconds: 5),
+                ()=>Navigator.pushReplacement(context,
+                MaterialPageRoute(builder:
+                    (context) => const loginPage()
+                )
+            )
+        );
       }
     } else {
+      box.put('email', '');
+      box.put('password', '');
       Timer(const Duration(seconds: 5),
               ()=>Navigator.pushReplacement(context,
               MaterialPageRoute(builder:
-                  (context) => loginPage()
+                  (context) => const loginPage()
               )
           )
       );
@@ -69,29 +74,27 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState()  {
     super.initState();
-    bool firstTimeState = box.get('introduction') ?? true;
-    print(firstTimeState);
 
-    Timer(const Duration(seconds: 5),
-            ()=>Navigator.pushReplacement(context,
-            MaterialPageRoute(builder:
-                (context) => CalendarApp()
-            )
-        )
-    );
+    // firstTime Launch
+    // if null or true, proceed to onBoarding.
+    // set LaunchKey False when user clicks onDone() in onboarding.
 
-    /*if(firstTimeState){
+    if(box.get('firstLaunchKey') ?? true){
+      box.put('password', '');
+      box.put('email', '');
       Timer(const Duration(seconds: 5),
               ()=>Navigator.pushReplacement(context,
               MaterialPageRoute(builder:
-                  (context) => IntroductionPage()
+                  (context) => const IntroductionPage()
               )
           )
       );
     } else {
-      //autoLogIn();
-    }*/
+      autoLogIn();
+    }
+
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
