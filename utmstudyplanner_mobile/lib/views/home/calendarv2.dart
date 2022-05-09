@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
 
 void main() {
   return runApp(CalendarApp());
@@ -15,6 +16,25 @@ class CalendarApp extends StatefulWidget {
   _CalendarPageState createState() => _CalendarPageState();
 }
 
+class CalendarEvent extends StatefulWidget {
+  const CalendarEvent({Key? key}) : super(key: key);
+
+  @override
+  // ignore: no_logic_in_create_state
+  _CalendarEventPageState createState() => _CalendarEventPageState();
+}
+
+class _CalendarEventPageState extends State<CalendarEvent> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(93, 6, 29, 1.0),
+      ),
+    );
+  }
+}
+
 class _CalendarPageState extends State<CalendarApp> {
   @override
   Widget build(BuildContext context) {
@@ -24,7 +44,7 @@ class _CalendarPageState extends State<CalendarApp> {
       ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CalendarEvent()));
           },
           backgroundColor: Colors.blueGrey,
           child: const Icon(Icons.add),
