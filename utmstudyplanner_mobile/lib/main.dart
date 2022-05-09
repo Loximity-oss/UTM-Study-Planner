@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendarv2.dart';
 import 'package:utmstudyplanner_mobile/views/onboarding.dart';
 import 'dart:async';
 import 'views/login/login.dart';
@@ -69,7 +71,16 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     bool firstTimeState = box.get('introduction') ?? true;
     print(firstTimeState);
-    if(firstTimeState){
+
+    Timer(const Duration(seconds: 5),
+            ()=>Navigator.pushReplacement(context,
+            MaterialPageRoute(builder:
+                (context) => CalendarApp()
+            )
+        )
+    );
+
+    /*if(firstTimeState){
       Timer(const Duration(seconds: 5),
               ()=>Navigator.pushReplacement(context,
               MaterialPageRoute(builder:
@@ -78,8 +89,8 @@ class _SplashScreenState extends State<SplashScreen> {
           )
       );
     } else {
-      autoLogIn();
-    }
+      //autoLogIn();
+    }*/
   }
   @override
   Widget build(BuildContext context) {
