@@ -3,13 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/login/login.dart';
-import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendarv2.dart';
 import 'package:utmstudyplanner_mobile/views/notifications/TestNotifyScreen.dart';
 
+class homepage extends StatefulWidget{
+  const homepage({Key? key}) : super(key: key);
 
-class homepage extends StatelessWidget {
+  @override
+  State<homepage> createState() => _homepageState();
+}
+
+class _homepageState extends State<homepage>{
   final GlobalKey<ScaffoldState> _homepageKey = GlobalKey<ScaffoldState>();
   final box = Hive.box('');
+
+  @override
+  void initState()  {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +50,7 @@ class homepage extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CalendarPage(title: 'Your Calendar')
+                    MaterialPageRoute(builder: (context) => const CalendarApp()
                     ));
               },
             ),
@@ -68,7 +79,7 @@ class homepage extends StatelessWidget {
                     children: [
                       Divider(),
                       ListTile(
-                          leading: FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, color: Colors.black),
+                          leading: const FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, color: Colors.black),
                           title: const Text('Logout'),
                           onTap: () => showDialog(context: context, builder: (BuildContext context) => AlertDialog(
                             title: const Text('Logout'),

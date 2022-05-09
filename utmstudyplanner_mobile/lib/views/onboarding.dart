@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
@@ -44,11 +43,11 @@ class IntroductionPage extends StatelessWidget {
           ),
         ],
         onDone: () {
-          box.put('introduction', false);
+          box.put('firstLaunchKey', false);
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (BuildContext context) {
-                return loginPage();
+                return const loginPage();
               },
             ),
           );

@@ -1,27 +1,30 @@
-import 'package:mysql1/mysql1.dart';
+import 'package:mysql_client/mysql_client.dart';
 
 class Mysql {
   Mysql();
-  Future<MySqlConnection> getConnection() async {
 
-    //  HOST: localhost OR if you are using a physical device,
-    //  check your IPv4 address via ipconfig
-    //  then change host to your IPV4 address.
+  Future<IResultSet> execQuery(String query) async{
+    final conn = await MySQLConnection.createConnection(
+      host: "10.0.2.2",
+      port: 3306,
+      userName: "UTM",
+      password: ".JzO2Agvp*UFj@g[",
+      databaseName: 'utm_study_planner',
+      secure: false //XAMPP MariaDB version >10. issue in library.
+    );
+
+    // try connecting to DB.
+    // if true, connection is successful.
+    // if false, connection failed and pass to alertDialog.
 
     try{
-      var settings = ConnectionSettings(
-          host: '192.168.145.78',
-          port: 3306,
-          user: 'root',
-          password: '',
-          db: 'utmstudyplanner'
-      );
-      return await MySqlConnection.connect(settings);
-    } catch (e) {
-      //TODO error throw
+      await conn.connect();
+      var result = await conn.execute(query);
+      conn.close();
+      return result;
+
+    } catch(e){
       rethrow;
     }
-
-
   }
 }

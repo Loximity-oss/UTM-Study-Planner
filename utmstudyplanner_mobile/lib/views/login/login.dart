@@ -26,55 +26,41 @@ class _loginPageState extends State<loginPage> {
   bool visible = false;
 
   Future userLogin() async{
-  // Showing CircularProgressIndicator.
+
     setState(() {
-      visible = true ;
+      visible = true;
+
     });
     // Getting value from Controller
     String email = emailInput.text;
     String password = passwordInput.text;
 
-    try{
-      var db = new Mysql();
-      db.getConnection().then((conn) async {
-        conn.query("SELECT * FROM user WHERE email = ? AND password = ?", [email, password]).then((results) {
-          if(results.length == 1){
-            box.put('email',email);
-            box.put('password',password);
-            Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => homepage())
-            );
-          } else {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('e'),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text("OK"),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          }
-        });
-        conn.close();
+    //TODO implement conn checking
+    var db = Mysql();
+    String query = 'SELECT * FROM `users` WHERE `email` = "'+ email +'" AND password = "' + password + '"';
+    var result = await db.execQuery(query);
+    if(result.numOfRows == 1){
+      box.put('email', email);
+      box.put('password', password);
+      Timer(const Duration(seconds: 5),
+              ()=>Navigator.pushReplacement(context,
+              MaterialPageRoute(builder:
+                  (context) => homepage()
+              )
+          )
+      );
+    } else {
+      setState(() {
+        visible = false ;
       });
-    }catch(e){
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(e.toString()),
+            title: const Text('Username or Password is incorrect.'),
             actions: <Widget>[
               FlatButton(
-                child: Text("OK"),
+                child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -84,14 +70,10 @@ class _loginPageState extends State<loginPage> {
         },
       );
     }
-
-
   }
 
 
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 249, 235),
       body: SingleChildScrollView(
