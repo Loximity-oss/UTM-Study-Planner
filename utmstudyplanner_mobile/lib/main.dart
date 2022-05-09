@@ -1,105 +1,97 @@
-// UTM Study Planner
-//
-//
-//
-
-
 import 'dart:convert';
-import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:utmstudyplanner_mobile/server/conn.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendarv2.dart';
 import 'package:utmstudyplanner_mobile/views/onboarding.dart';
-import 'package:utmstudyplanner_mobile/server/conn.dart';
-
+import 'dart:async';
 import 'views/login/login.dart';
 import 'views/home/homescreen.dart';
 
+import 'package:http/http.dart' as http;
 
 
 void main() async{
   await Hive.initFlutter();
   await Hive.openBox('');
-  runApp(const MaterialApp(home: SplashScreen()));
+  runApp(MaterialApp(home: SplashScreen()));
 }
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
-
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 class _SplashScreenState extends State<SplashScreen> {
   final box = Hive.box('');
-
-  //  Autologin Feature
-  //  Get email/password from local Hive NOSQL.
-  //  Verify with DB then go to Dashboard.
-
   void autoLogIn() async{
     String email, password;
-    try{
-      email = box.get('email');
-      password = box.get('password');
+    email = box.get('email');
+    password = box.get('password');
 
-      var db = new Mysql();
-      db.getConnection().then((conn) async {
-        conn.query("SELECT * FROM user WHERE email = ? AND password = ?", [email, password]).then((results) {
-          if(results.length == 1){
-            Timer(const Duration(seconds: 5),
-                    ()=>Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder:
-                        (context) => homepage()
-                    )
+    if(email.isNotEmpty && password.isNotEmpty){
+      // SERVER LOGIN API URL
+      var url = Uri.parse('http://192.168.68.104/login.php');
+      // Store all data with Param Name.
+      var data = {'email': email, 'password' : password};
+      // Starting Web API Call.
+      var response = await http.post(
+          url,
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(data)
+      );
+      // Getting Server response into variable.
+      var message = jsonDecode(response.body);
+      if(message == "True") {
+        Timer(const Duration(seconds: 5),
+                ()=>Navigator.pushReplacement(context,
+                MaterialPageRoute(builder:
+                    (context) => homepage()
                 )
-            );
-          } else {
-            //clear entries if no match.
-            box.put('email','');
-            box.put('password','');
-          }
-        });
-        conn.close();
-      });
-    } catch (e){
+            )
+        );
+      } else {
+        box.put('email','');
+        box.put('password','');
+      }
+    } else {
       Timer(const Duration(seconds: 5),
               ()=>Navigator.pushReplacement(context,
               MaterialPageRoute(builder:
-                  (context) => const loginPage()
+                  (context) => loginPage()
               )
           )
       );
     }
-
-
-
-  }//end AutoLogin
-
-
-  //  Jump to onboarding if firstTimeState is false.
-  //  If true jump to loginPage (after AutoLogin = failed) OR no content in Hive NOSQL
+  }
 
   @override
   void initState()  {
     super.initState();
     bool firstTimeState = box.get('introduction') ?? true;
+    print(firstTimeState);
 
-    if(firstTimeState){
+    Timer(const Duration(seconds: 5),
+            ()=>Navigator.pushReplacement(context,
+            MaterialPageRoute(builder:
+                (context) => CalendarApp()
+            )
+        )
+    );
+
+    /*if(firstTimeState){
       Timer(const Duration(seconds: 5),
               ()=>Navigator.pushReplacement(context,
               MaterialPageRoute(builder:
-                  (context) => const IntroductionPage()
+                  (context) => IntroductionPage()
               )
           )
       );
     } else {
-      autoLogIn();
-    }
+      //autoLogIn();
+    }*/
   }
-
-  //  SplashScreen
-
   @override
   Widget build(BuildContext context) {
     return Container(

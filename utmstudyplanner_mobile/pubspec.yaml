@@ -38,7 +38,7 @@ dependencies:
   http: 0.13.4
   flutter_local_notifications: ^9.4.1
   rxdart: ^0.27.3
-  mysql1: 0.19.2
+  syncfusion_flutter_calendar: ^20.1.52
 
 dev_dependencies:
   flutter_test:
@@ -68,7 +68,7 @@ flutter:
      - assets/onboarding/
      - assets/signup/
      - assets/Profile/
-
+     - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
