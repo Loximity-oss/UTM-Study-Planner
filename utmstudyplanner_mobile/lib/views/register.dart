@@ -51,6 +51,7 @@ class _registerPageState extends State<registerPage> {
                   child: const Text("OK"),
                   onPressed: () {
                     Navigator.of(context).pop();
+                    Navigator.of(context).pop();
                   },
                 ),
               ],
@@ -183,8 +184,12 @@ class _registerPageState extends State<registerPage> {
                             validator: (nicknameCheck) {
                               if (nicknameCheck == null || nicknameCheck.isEmpty) {
                                 return 'Please enter a nickname.';
+                              } else if (nicknameCheck.trim().length > 10){
+                                return 'Nickname too long. Max 10 chars.';
+                              } else {
+                                return null;
                               }
-                              return null;
+
                             },
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.only(left: 20, right: 20),

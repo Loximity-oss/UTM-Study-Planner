@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -23,9 +24,444 @@ class CalendarApp extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarApp> {
   final box = Hive.box('');
+  final titleInput = TextEditingController();
+  final dateBeforeInput = TextEditingController();
+  final dateAfterInput = TextEditingController();
+  final timeBeforeInput = TextEditingController();
+  final timeAfterInput = TextEditingController();
+  final _formAddEventKey = GlobalKey<FormState>();
+  final _formEditEventKey = GlobalKey<FormState>();
+
+  MeetingDataSource? events;
+  Future<void> editData(int id) async{
+    var db = Mysql();
+    String query = 'UPDATE `event` SET `eventName` = "'+ titleInput.text +'", '
+        '`fromEvent` = "'+ dateBeforeInput.text + ' ' + timeBeforeInput.text +'", '
+    '`toEvent` = "'+ dateAfterInput.text + ' ' + timeAfterInput.text +'", '
+    '`background` = "0xFF0F8644" '
+    'WHERE `event`.`eventID` = "'+ id.toString() + '"';
+    try{
+      var result = await db.execQuery(query);
+      if (result.affectedRows.toInt() == 1) {
+        titleInput.clear();
+        dateBeforeInput.clear();
+        dateAfterInput.clear();
+        timeBeforeInput.clear();
+        timeAfterInput.clear();
+
+        Navigator.of(context).pop();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Event Edited'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {});
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }catch(e){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    getData();
+  }
+
+  Future<void> addData() async{
+    var db = Mysql();
+    String query = 'INSERT INTO `event` (`eventID`, `eventName`, `fromEvent`, `toEvent`, `background`, `isAllDay`, `matricID`) VALUES (NULL, '
+        '"'+ titleInput.text +'", '
+        '"'+ dateBeforeInput.text + ' ' + timeBeforeInput.text +'", '
+        '"'+ dateAfterInput.text + ' ' + timeAfterInput.text +'", '
+        '"0xFF0F8644", 0, '
+        '"'+ box.get('matricID')+'")';
+
+    print(query);
+    try{
+      var result = await db.execQuery(query);
+      if (result.affectedRows.toInt() == 1) {
+        titleInput.clear();
+        dateBeforeInput.clear();
+        dateAfterInput.clear();
+        timeBeforeInput.clear();
+        timeAfterInput.clear();
+
+        Navigator.of(context).pop();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Event Added'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {});
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }catch(e){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    getData();
+  }
+
+  Future<void> deleteData(int id) async{
+    var db = Mysql();
+    String query = 'DELETE FROM event WHERE `event`.`eventID` = "'+ id.toString() +'"';
+    try{
+      var result = await db.execQuery(query);
+      if (result.affectedRows.toInt() == 1) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Event Deleted'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {});
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }catch(e){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    getData();
+  }
+
+  Future<void> getData() async{
+    //list to send to dataSource
+    List<Meeting> meetings = <Meeting>[];
+    var db = Mysql();
+    String query = 'SELECT * FROM `event` WHERE `matricID` = "'+ box.get("matricID") +'"';
+    print(query);
+    try{
+      var result = await db.execQuery(query);
+
+      for (final row in result.rows) {
+        print(DateTime.parse(row.colByName("fromEvent")!));
+        meetings.add(Meeting(
+            row.colByName("eventName")!,
+            DateTime.parse(row.colByName("fromEvent")!),
+            DateTime.parse(row.colByName("toEvent")!),
+            Color(int.parse(row.colByName("background")!)),
+            false,
+            int.parse(row.colByName("eventID")!)));
+      }
+      setState(() {
+        events = MeetingDataSource(meetings);
+      });
+
+    }catch(e) {
+      print(e.toString());
+    }
+  }
+
+  void editDataModal(Meeting appointmentDetails) async{
+    titleInput.text = appointmentDetails.eventName;
+    dateBeforeInput.text = DateFormat('yyyy-MM-dd').format(appointmentDetails.from);
+    dateAfterInput.text = DateFormat('yyyy-MM-dd').format(appointmentDetails.to);
+    timeBeforeInput.text = DateFormat('hh:mm:ss').format(appointmentDetails.from);
+    timeAfterInput.text = DateFormat('hh:mm:ss').format(appointmentDetails.to);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Event'),
+          content: Container(
+            child: Form(
+              key: _formEditEventKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextFormField(controller: titleInput,
+                    textInputAction: TextInputAction.next,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (title) {
+                      if (title == null || title.isEmpty) {
+                        return 'Please enter a title.';
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: InputDecoration(
+                        hintStyle: TextStyle(color: Colors.grey[800]),
+                        hintText: "Event Title"),
+                  ),
+                  TextFormField(
+                    controller: dateBeforeInput,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      final DateTime? selectedDate = await showDatePicker(context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(0),
+                          lastDate: DateTime(9999));
+                      dateBeforeInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+                    },
+                    decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                        hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: const BorderSide(
+                            width: 0,
+                            style: BorderStyle.none,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white
+                    ),
+                  ),
+                  TextFormField(
+                    controller: timeBeforeInput,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                          initialTime: TimeOfDay.now()
+                      );
+
+                      DateTime formattedTime(TimeOfDay today){
+                        final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                        return newTime;
+                      }
+                      timeBeforeInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
+                    },
+                    decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                        hintText: DateFormat.Hm().format(DateTime.now()),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: const BorderSide(
+                            width: 0,
+                            style: BorderStyle.none,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white
+                    ),
+                  ),
+
+                  TextFormField(
+                    controller: dateAfterInput,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      final DateTime? selectedDate = await showDatePicker(context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(0),
+                          lastDate: DateTime(9999));
+                      dateAfterInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+                    },
+
+                    decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                        hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: const BorderSide(
+                            width: 0,
+                            style: BorderStyle.none,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white
+                    ),
+                  ),
+
+                  TextFormField(
+                    controller: timeAfterInput,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                          initialTime: TimeOfDay.now()
+                      );
+
+                      DateTime formattedTime(TimeOfDay today){
+                        final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                        return newTime;
+                      }
+                      timeAfterInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
+                    },
+                    decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                        hintText: DateFormat.jm().format(DateTime.now().add(const Duration(hours: 2))),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: const BorderSide(
+                            width: 0,
+                            style: BorderStyle.none,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white
+                    ),
+                  ),
+
+
+                ],
+              ),
+            ),
+
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text("OK"),
+              onPressed: () => _formEditEventKey.currentState!.validate() ? editData(appointmentDetails.id) : null,
+            ),
+            FlatButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+
+        );
+      },
+    );
+
+    //getData();
+  }
+
+
+
+  void tapped(CalendarTapDetails details) {
+    if (details.targetElement == CalendarElement.appointment ||
+        details.targetElement == CalendarElement.agenda) {
+      final Meeting appointmentDetails = details.appointments![0];
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(appointmentDetails.eventName),
+              content: SizedBox(
+                height: 80,
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          appointmentDetails.to.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          appointmentDetails.to.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      deleteData(appointmentDetails.id);
+                    },
+                    child: new Text('Delete')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      editDataModal(appointmentDetails);
+                    },
+                    child: new Text('Edit')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: new Text('Close')),
+              ],
+            );
+          });
+    }
+  }
+
+
+
+
 
   @override
   void initState() {
+    getData();
     super.initState();
   }
 
@@ -35,59 +471,218 @@ class _CalendarPageState extends State<CalendarApp> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendar'),
-          backgroundColor: const Color.fromRGBO(93, 6, 29, 1.0),
+        backgroundColor: const Color.fromRGBO(93, 6, 29, 1.0),
       ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            //Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CalendarEvent()));
-          },
-          backgroundColor: Colors.blueGrey,
-          child: const Icon(Icons.add),
-        ),
-        body: SfCalendar(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Add Event'),
+                content: Container(
+                  child: Form(
+                    key: _formAddEventKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        TextFormField(controller: titleInput,
+                            textInputAction: TextInputAction.next,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            validator: (title) {
+                              if (title == null || title.isEmpty) {
+                                return 'Please enter a title.';
+                              } else {
+                                return null;
+                              }
+                            },
+                            decoration: InputDecoration(
+                                hintStyle: TextStyle(color: Colors.grey[800]),
+                                hintText: "Event Title"),
+                        ),
+                        TextFormField(
+                          controller: dateBeforeInput,
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            final DateTime? selectedDate = await showDatePicker(context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(0),
+                                lastDate: DateTime(9999));
+                            dateBeforeInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+                          },
+                          decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                              hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: const BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white
+                          ),
+                        ),
+                        TextFormField(
+                          controller: timeBeforeInput,
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                                initialTime: TimeOfDay.now()
+                            );
+
+                            DateTime formattedTime(TimeOfDay today){
+                              final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                              return newTime;
+                            }
+                            timeBeforeInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
+                          },
+                          decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                              hintText: DateFormat.Hm().format(DateTime.now()),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: const BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white
+                          ),
+                        ),
+
+                        TextFormField(
+                          controller: dateAfterInput,
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            final DateTime? selectedDate = await showDatePicker(context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(0),
+                                lastDate: DateTime(9999));
+                            dateAfterInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+                          },
+
+                          decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                              hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: const BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white
+                          ),
+                        ),
+
+                        TextFormField(
+                          controller: timeAfterInput,
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                                initialTime: TimeOfDay.now()
+                            );
+
+                            DateTime formattedTime(TimeOfDay today){
+                              final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                              return newTime;
+                            }
+                            timeAfterInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
+                          },
+                          decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                              hintText: DateFormat.jm().format(DateTime.now().add(const Duration(hours: 2))),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: const BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white
+                          ),
+                        ),
+
+
+                      ],
+                    ),
+                  ),
+
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    child: const Text("OK"),
+                    onPressed: () => _formAddEventKey.currentState!.validate() ? addData() : null,
+                  ),
+                  FlatButton(
+                    child: const Text("Cancel"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+
+              );
+            },
+          );
+        },
+        backgroundColor: Colors.blueGrey,
+        child: const Icon(Icons.add),
+      ),
+      body: SfCalendar(
           view: CalendarView.schedule,
           showDatePickerButton: true,
           todayHighlightColor: Colors.blue,
-          dataSource: MeetingDataSource(_getDataSource()),
+          dataSource: events,
+          onTap: tapped,
           scheduleViewMonthHeaderBuilder: (BuildContext buildContext,
-              ScheduleViewMonthHeaderDetails details) {
-            final String monthName = _getMonthName(details.date.month);
-            return Stack(
-              children: [
-                Image(
-                    image: ExactAssetImage('assets/images/' + monthName + '.png'),
-                    fit: BoxFit.cover,
-                    width: details.bounds.width,
-                    height: details.bounds.height),
-                Positioned(
-                  left: 55,
-                  right: 0,
-                  top: 20,
-                  bottom: 0,
-                  child: Text(
-                    monthName + ' ' + details.date.year.toString(),
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                )
-              ],
-            );
-          },
-
-          allowedViews: const <CalendarView>
-          [
-            CalendarView.day,
-            CalendarView.week,
-            CalendarView.workWeek,
-            CalendarView.month,
-            CalendarView.schedule
+          ScheduleViewMonthHeaderDetails details)
+      {
+      final String monthName = _getMonthName(details.date.month);
+        return Stack(
+          children: [
+              Image(
+              image: ExactAssetImage('assets/images/' + monthName + '.png'),
+              fit: BoxFit.cover,
+              width: details.bounds.width,
+              height: details.bounds.height),
+              Positioned(
+              left: 55,
+              right: 0,
+              top: 20,
+              bottom: 0,
+              child: Text(
+              monthName + ' ' + details.date.year.toString(),
+              style: const TextStyle(fontSize: 18),
+              ),
+            )
           ],
-          // by default the month appointment display mode set as Indicator, we can
-          // change the display mode as appointment using the appointment display
-          // mode property
-          monthViewSettings: const MonthViewSettings(
-              showAgenda: true,
-              appointmentDisplayMode: MonthAppointmentDisplayMode.indicator),
-        ));
+        );
+      },
+
+      allowedViews: const <CalendarView>
+      [
+        CalendarView.day,
+        CalendarView.week,
+        CalendarView.workWeek,
+        CalendarView.month,
+        CalendarView.schedule
+      ],
+      // by default the month appointment display mode set as Indicator, we can
+      // change the display mode as appointment using the appointment display
+      // mode property
+      monthViewSettings: const MonthViewSettings(
+          showAgenda: true,
+          appointmentDisplayMode: MonthAppointmentDisplayMode.indicator),
+    ));
   }
 
   String _getMonthName(int month) {
@@ -117,24 +712,8 @@ class _CalendarPageState extends State<CalendarApp> {
       return 'December';
     }
   }
-
-  Future<List<Meeting>> _getDataSource() async {
-    List<Meeting> meetings = <Meeting>[];
-    var db = Mysql();
-    String query = 'SELECT * FROM `event` WHERE `matricID` = "'+ box.get("matricID") +'";';
-    try{
-      var result = await db.execQuery(query);
-    }catch(e) {
-
-    }
-
-
-
-    meetings.add(Meeting(
-        'Conference', DateTime(2022, 5, 8, 9, 0, 0), DateTime(2022, 5, 8, 11, 0, 0), const Color(0xFF0F8644), false, 1));
-    return meetings;  /// Creates a meeting class with required details.
-  }
 }
+
 
 /// An object to set the appointment collection data source to calendar, which
 /// used to map the custom appointment data to the calendar appointment, and
@@ -143,8 +722,8 @@ class MeetingDataSource extends CalendarDataSource {
 
   /// Creates a meeting data source, which used to set the appointment
   /// collection to the calendar
-  MeetingDataSource(Future<List<Meeting>> source) {
-    appointments = source as List?;
+  MeetingDataSource(List<Meeting> source) {
+    appointments = source;
   }
 
   @override
