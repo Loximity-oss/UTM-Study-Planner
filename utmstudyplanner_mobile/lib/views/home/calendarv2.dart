@@ -2,9 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
+
+import '../../server/conn.dart';
 
 void main() {
   return runApp(CalendarApp());
@@ -34,7 +37,8 @@ class _CalendarEventPageState extends State<CalendarEvent> {
   final dateAfterInput = TextEditingController();
   final timeBeforeInput = TextEditingController();
   final timeAfterInput = TextEditingController();
-  late DateTime date;
+
+  final calendarBox = Hive.box('');
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +96,7 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                                   firstDate: DateTime(0),
                                   lastDate: DateTime(9999));
                               dateBeforeInput.text = DateFormat.yMMMEd().format(selectedDate!);
+                              calendarBox.put('dateBeforeInput', dateBeforeInput);
                             },
 
                             decoration: InputDecoration(
@@ -124,6 +129,7 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                                 return newTime;
                               }
                               timeBeforeInput.text = DateFormat.jm().format(formattedTime(selectedTime!));
+                              calendarBox.put("timeBeforeInput", timeBeforeInput);
                             },
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.only(left: 20, right: 20),
@@ -159,6 +165,7 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                                     firstDate: DateTime(0),
                                     lastDate: DateTime(9999));
                                 dateAfterInput.text = DateFormat.yMMMEd().format(selectedDate!);
+                                calendarBox.put("dateAfterInput", dateAfterInput);
                               },
 
                               decoration: InputDecoration(
@@ -191,6 +198,7 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                                 return newTime;
                               }
                               timeAfterInput.text = DateFormat.jm().format(formattedTime(selectedTime!));
+                              calendarBox.put("timeAfterInput", timeAfterInput);
                             },
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.only(left: 20, right: 20),
@@ -216,15 +224,18 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        TextButton(
+                        MaterialButton(
                             onPressed: (){
-                              
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => const CalendarApp())
+                              );
                             },
                             child:
                             const Text("Submit",
                               style: TextStyle(
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue
                               ),)
                         )
                       ],
@@ -330,11 +341,11 @@ class _CalendarPageState extends State<CalendarApp> {
   List<Meeting> _getDataSource() {
     final List<Meeting> meetings = <Meeting>[];
     meetings.add(Meeting(
-        'Conference', DateTime(2022, 5, 8, 9, 0, 0), DateTime(2022, 5, 8, 11, 0, 0), const Color(0xFF0F8644), false));
+        'Conference', DateTime(2022, 5, 8, 9, 0, 0), DateTime(2022, 5, 8, 11, 0, 0), const Color(0xFF0F8644), false, 1));
     meetings.add(Meeting(
-        'Test 1 Computer Networks', DateTime(2022, 5, 18, 20, 0, 0), DateTime(2022, 5, 18, 22, 0, 0), const Color(0xff00a4b4), false));
+        'Test 1 Computer Networks', DateTime(2022, 5, 18, 20, 0, 0), DateTime(2022, 5, 18, 22, 0, 0), const Color(0xff00a4b4), false, 2));
     meetings.add(Meeting(
-        'Exam 1 Computer Networks Lab', DateTime(2022, 5, 19, 20, 0, 0), DateTime(2022, 5, 19, 22, 0, 0), const Color(0xFFB2A4D4), false));
+        'Exam 1 Computer Networks Lab', DateTime(2022, 5, 19, 20, 0, 0), DateTime(2022, 5, 19, 22, 0, 0), const Color(0xFFB2A4D4), false, 3));
     return meetings;
   }
 }
@@ -374,6 +385,11 @@ class MeetingDataSource extends CalendarDataSource {
     return _getMeetingData(index).isAllDay;
   }
 
+  @override
+  int id(int index) {
+    return _getMeetingData(index).id;
+  }
+
   Meeting _getMeetingData(int index) {
     final dynamic meeting = appointments![index];
     late final Meeting meetingData;
@@ -389,7 +405,7 @@ class MeetingDataSource extends CalendarDataSource {
 /// information about the event data which will be rendered in calendar.
 class Meeting {
   /// Creates a meeting class with required details.
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
+  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay, this.id);
 
   /// Event name which is equivalent to subject property of [Appointment].
   String eventName;
@@ -405,4 +421,6 @@ class Meeting {
 
   /// IsAllDay which is equivalent to isAllDay property of [Appointment].
   bool isAllDay;
+
+  int id;
 }
