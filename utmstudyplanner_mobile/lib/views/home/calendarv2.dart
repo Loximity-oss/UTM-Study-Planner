@@ -34,6 +34,7 @@ class _CalendarEventPageState extends State<CalendarEvent> {
   final dateAfterInput = TextEditingController();
   final timeBeforeInput = TextEditingController();
   final timeAfterInput = TextEditingController();
+  late DateTime date;
 
   @override
   Widget build(BuildContext context) {
@@ -84,17 +85,17 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                         Expanded(
                           child: TextFormField(
                             controller: dateBeforeInput,
-                            onTap: () {
+                            onTap: () async {
                               FocusScope.of(context).requestFocus(FocusNode());
-                              showDatePicker(context: context,
+                              final DateTime? selectedDate = await showDatePicker(context: context,
                                   initialDate: DateTime.now(),
                                   firstDate: DateTime(0),
                                   lastDate: DateTime(9999));
+                              dateBeforeInput.text = DateFormat.yMMMEd().format(selectedDate!);
                             },
 
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.only(left: 20, right: 20),
-                                labelText: DateFormat.yMMMEd().format(DateTime.now()),
                                 hintText: DateFormat.yMMMEd().format(DateTime.now()),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30.0),
@@ -112,15 +113,20 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                         Expanded(
                           child: TextFormField(
                             controller: timeBeforeInput,
-                            onTap: (){
+                            onTap: () async {
                               FocusScope.of(context).requestFocus(FocusNode());
-                              showTimePicker(context: context,
+                              final TimeOfDay? selectedTime = await showTimePicker(context: context,
                                   initialTime: TimeOfDay.now()
                               );
+
+                              DateTime formattedTime(TimeOfDay today){
+                                final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                                return newTime;
+                              }
+                              timeBeforeInput.text = DateFormat.jm().format(formattedTime(selectedTime!));
                             },
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.only(left: 20, right: 20),
-                                labelText: DateFormat.jm().format(DateTime.now()),
                                 hintText: DateFormat.jm().format(DateTime.now()),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30.0),
@@ -137,6 +143,93 @@ class _CalendarEventPageState extends State<CalendarEvent> {
                       ],
                     ),
                   ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                            child: TextFormField(
+                              controller: dateAfterInput,
+                              onTap: () async {
+                                FocusScope.of(context).requestFocus(FocusNode());
+                                final DateTime? selectedDate = await showDatePicker(context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(0),
+                                    lastDate: DateTime(9999));
+                                dateAfterInput.text = DateFormat.yMMMEd().format(selectedDate!);
+                              },
+
+                              decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                                  hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      width: 0,
+                                      style: BorderStyle.none,
+                                    ),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white
+                              ),
+                            )
+                        ),
+
+                        Expanded(
+                          child: TextFormField(
+                            controller: timeAfterInput,
+                            onTap: () async {
+                              FocusScope.of(context).requestFocus(FocusNode());
+                              final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                                  initialTime: TimeOfDay.now()
+                              );
+
+                              DateTime formattedTime(TimeOfDay today){
+                                final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                                return newTime;
+                              }
+                              timeAfterInput.text = DateFormat.jm().format(formattedTime(selectedTime!));
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                                hintText: DateFormat.jm().format(DateTime.now().add(const Duration(hours: 2))),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: const BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 5.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        TextButton(
+                            onPressed: (){
+                              
+                            },
+                            child:
+                            const Text("Submit",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold
+                              ),)
+                        )
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
