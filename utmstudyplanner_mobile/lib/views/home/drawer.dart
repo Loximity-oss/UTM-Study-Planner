@@ -5,7 +5,7 @@ import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
 import 'package:utmstudyplanner_mobile/views/home/profile.dart';
 import '../login/login.dart';
 import '../notifications/TestNotifyScreen.dart';
-import 'calendarv2.dart';
+import 'calendar/calendarv2.dart';
 
 class DefAppBar extends StatelessWidget {
   DefAppBar({Key? key}) : super(key: key);
