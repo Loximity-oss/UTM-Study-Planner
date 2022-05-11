@@ -34,6 +34,12 @@ dependencies:
   introduction_screen: ^3.0.2
   font_awesome_flutter: 10.1.0
   flutter_calendar_carousel: ^2.1.0
+  email_validator: ^2.0.1
+  http: 0.13.4
+  flutter_local_notifications: ^9.4.1
+  rxdart: ^0.27.3
+  syncfusion_flutter_calendar: ^20.1.52
+  mysql_client: ^0.0.16
 
 dev_dependencies:
   flutter_test:
@@ -59,9 +65,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/splash.png
-     - assets/onboarding/
-     - assets/signup/
+    - assets/splash.png
+    - assets/onboarding/
+    - assets/signup/
+    - assets/Profile/
+    - assets/images/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
