@@ -1,5 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:utmstudyplanner_mobile/views/home/calendar.dart';
+
+import '../../server/conn.dart';
 
 void main() {
   return runApp(CalendarApp());
@@ -15,6 +23,233 @@ class CalendarApp extends StatefulWidget {
   _CalendarPageState createState() => _CalendarPageState();
 }
 
+class CalendarEvent extends StatefulWidget {
+  const CalendarEvent({Key? key}) : super(key: key);
+
+  @override
+  // ignore: no_logic_in_create_state
+  _CalendarEventPageState createState() => _CalendarEventPageState();
+}
+
+class _CalendarEventPageState extends State<CalendarEvent> {
+  final titleInput = TextEditingController();
+  final dateBeforeInput = TextEditingController();
+  final dateAfterInput = TextEditingController();
+  final timeBeforeInput = TextEditingController();
+  final timeAfterInput = TextEditingController();
+
+  final calendarBox = Hive.box('');
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(93, 6, 29, 1.0),
+        title: const Text('Add Event'),
+      ),
+      body: CustomScrollView( // main content
+        slivers: <Widget>[
+            //Todo List Section
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 5.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        TextFormField(controller: titleInput,
+                          style: const TextStyle(fontSize: 24),
+                          textInputAction: TextInputAction.next,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: const BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              filled: true,
+                              hintStyle: TextStyle(color: Colors.grey[800]),
+                              hintText: "Add title",
+                              fillColor: Colors.white)
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            controller: dateBeforeInput,
+                            onTap: () async {
+                              FocusScope.of(context).requestFocus(FocusNode());
+                              final DateTime? selectedDate = await showDatePicker(context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(0),
+                                  lastDate: DateTime(9999));
+                              dateBeforeInput.text = DateFormat.yMMMEd().format(selectedDate!);
+                              calendarBox.put('dateBeforeInput', dateBeforeInput);
+                            },
+
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                                hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: const BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                              filled: true,
+                              fillColor: Colors.white
+                            ),
+                          )
+                        ),
+                        
+                        Expanded(
+                          child: TextFormField(
+                            controller: timeBeforeInput,
+                            onTap: () async {
+                              FocusScope.of(context).requestFocus(FocusNode());
+                              final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                                  initialTime: TimeOfDay.now()
+                              );
+
+                              DateTime formattedTime(TimeOfDay today){
+                                final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                                return newTime;
+                              }
+                              timeBeforeInput.text = DateFormat.jm().format(formattedTime(selectedTime!));
+                              calendarBox.put("timeBeforeInput", timeBeforeInput);
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                                hintText: DateFormat.jm().format(DateTime.now()),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: const BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                              filled: true,
+                              fillColor: Colors.white
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                            child: TextFormField(
+                              controller: dateAfterInput,
+                              onTap: () async {
+                                FocusScope.of(context).requestFocus(FocusNode());
+                                final DateTime? selectedDate = await showDatePicker(context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(0),
+                                    lastDate: DateTime(9999));
+                                dateAfterInput.text = DateFormat.yMMMEd().format(selectedDate!);
+                                calendarBox.put("dateAfterInput", dateAfterInput);
+                              },
+
+                              decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                                  hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      width: 0,
+                                      style: BorderStyle.none,
+                                    ),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white
+                              ),
+                            )
+                        ),
+
+                        Expanded(
+                          child: TextFormField(
+                            controller: timeAfterInput,
+                            onTap: () async {
+                              FocusScope.of(context).requestFocus(FocusNode());
+                              final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                                  initialTime: TimeOfDay.now()
+                              );
+
+                              DateTime formattedTime(TimeOfDay today){
+                                final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                                return newTime;
+                              }
+                              timeAfterInput.text = DateFormat.jm().format(formattedTime(selectedTime!));
+                              calendarBox.put("timeAfterInput", timeAfterInput);
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                                hintText: DateFormat.jm().format(DateTime.now().add(const Duration(hours: 2))),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: const BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 5.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        MaterialButton(
+                            onPressed: (){
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => const CalendarApp())
+                              );
+                            },
+                            child:
+                            const Text("Submit",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue
+                              ),)
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+    );
+  }
+}
+
 class _CalendarPageState extends State<CalendarApp> {
   @override
   Widget build(BuildContext context) {
@@ -24,7 +259,7 @@ class _CalendarPageState extends State<CalendarApp> {
       ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CalendarEvent()));
           },
           backgroundColor: Colors.blueGrey,
           child: const Icon(Icons.add),
@@ -51,7 +286,7 @@ class _CalendarPageState extends State<CalendarApp> {
                   bottom: 0,
                   child: Text(
                     monthName + ' ' + details.date.year.toString(),
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
                 )
               ],
@@ -106,11 +341,11 @@ class _CalendarPageState extends State<CalendarApp> {
   List<Meeting> _getDataSource() {
     final List<Meeting> meetings = <Meeting>[];
     meetings.add(Meeting(
-        'Conference', DateTime(2022, 5, 8, 9, 0, 0), DateTime(2022, 5, 8, 11, 0, 0), const Color(0xFF0F8644), false));
+        'Conference', DateTime(2022, 5, 8, 9, 0, 0), DateTime(2022, 5, 8, 11, 0, 0), const Color(0xFF0F8644), false, 1));
     meetings.add(Meeting(
-        'Test 1 Computer Networks', DateTime(2022, 5, 18, 20, 0, 0), DateTime(2022, 5, 18, 22, 0, 0), const Color(0xff00a4b4), false));
+        'Test 1 Computer Networks', DateTime(2022, 5, 18, 20, 0, 0), DateTime(2022, 5, 18, 22, 0, 0), const Color(0xff00a4b4), false, 2));
     meetings.add(Meeting(
-        'Exam 1 Computer Networks Lab', DateTime(2022, 5, 19, 20, 0, 0), DateTime(2022, 5, 19, 22, 0, 0), const Color(0xFFB2A4D4), false));
+        'Exam 1 Computer Networks Lab', DateTime(2022, 5, 19, 20, 0, 0), DateTime(2022, 5, 19, 22, 0, 0), const Color(0xFFB2A4D4), false, 3));
     return meetings;
   }
 }
@@ -150,6 +385,11 @@ class MeetingDataSource extends CalendarDataSource {
     return _getMeetingData(index).isAllDay;
   }
 
+  @override
+  int id(int index) {
+    return _getMeetingData(index).id;
+  }
+
   Meeting _getMeetingData(int index) {
     final dynamic meeting = appointments![index];
     late final Meeting meetingData;
@@ -165,7 +405,7 @@ class MeetingDataSource extends CalendarDataSource {
 /// information about the event data which will be rendered in calendar.
 class Meeting {
   /// Creates a meeting class with required details.
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
+  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay, this.id);
 
   /// Event name which is equivalent to subject property of [Appointment].
   String eventName;
@@ -181,4 +421,6 @@ class Meeting {
 
   /// IsAllDay which is equivalent to isAllDay property of [Appointment].
   bool isAllDay;
+
+  int id;
 }
