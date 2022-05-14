@@ -56,7 +56,7 @@ class _CalendarPageState extends State<CalendarApp> {
             return AlertDialog(
               title: const Text('Event Edited'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: const Text("OK"),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -75,7 +75,7 @@ class _CalendarPageState extends State<CalendarApp> {
           return AlertDialog(
             title: Text(e.toString()),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -116,7 +116,7 @@ class _CalendarPageState extends State<CalendarApp> {
             return AlertDialog(
               title: const Text('Event Added'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: const Text("OK"),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -135,7 +135,7 @@ class _CalendarPageState extends State<CalendarApp> {
           return AlertDialog(
             title: Text(e.toString()),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -162,7 +162,7 @@ class _CalendarPageState extends State<CalendarApp> {
             return AlertDialog(
               title: const Text('Event Deleted'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: const Text("OK"),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -181,7 +181,7 @@ class _CalendarPageState extends State<CalendarApp> {
           return AlertDialog(
             title: Text(e.toString()),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -235,149 +235,146 @@ class _CalendarPageState extends State<CalendarApp> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Edit Event'),
-          content: Container(
-            child: Form(
-              key: _formEditEventKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextFormField(controller: titleInput,
-                    textInputAction: TextInputAction.next,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (title) {
-                      if (title == null || title.isEmpty) {
-                        return 'Please enter a title.';
-                      } else {
-                        return null;
-                      }
-                    },
-                    decoration: InputDecoration(
-                        hintStyle: TextStyle(color: Colors.grey[800]),
-                        hintText: "Event Title"),
-                  ),
-                  TextFormField(
-                    controller: dateBeforeInput,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      final DateTime? selectedDate = await showDatePicker(context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(0),
-                          lastDate: DateTime(9999));
-                      dateBeforeInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
-                    },
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
-                        hintText: DateFormat.yMMMEd().format(DateTime.now()),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
+          content: Form(
+            key: _formEditEventKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(controller: titleInput,
+                  textInputAction: TextInputAction.next,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (title) {
+                    if (title == null || title.isEmpty) {
+                      return 'Please enter a title.';
+                    } else {
+                      return null;
+                    }
+                  },
+                  decoration: InputDecoration(
+                      hintStyle: TextStyle(color: Colors.grey[800]),
+                      hintText: "Event Title"),
+                ),
+                TextFormField(
+                  controller: dateBeforeInput,
+                  onTap: () async {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    final DateTime? selectedDate = await showDatePicker(context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(0),
+                        lastDate: DateTime(9999));
+                    dateBeforeInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+                  },
+                  decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                      hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          width: 0,
+                          style: BorderStyle.none,
                         ),
-                        filled: true,
-                        fillColor: Colors.white
-                    ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white
                   ),
-                  TextFormField(
-                    controller: timeBeforeInput,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      final TimeOfDay? selectedTime = await showTimePicker(context: context,
-                          initialTime: TimeOfDay.now()
-                      );
+                ),
+                TextFormField(
+                  controller: timeBeforeInput,
+                  onTap: () async {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                        initialTime: TimeOfDay.now()
+                    );
 
-                      DateTime formattedTime(TimeOfDay today){
-                        final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
-                        return newTime;
-                      }
-                      timeBeforeInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
-                    },
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
-                        hintText: DateFormat.Hm().format(DateTime.now()),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
+                    DateTime formattedTime(TimeOfDay today){
+                      final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                      return newTime;
+                    }
+                    timeBeforeInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
+                  },
+                  decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                      hintText: DateFormat.Hm().format(DateTime.now()),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          width: 0,
+                          style: BorderStyle.none,
                         ),
-                        filled: true,
-                        fillColor: Colors.white
-                    ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white
                   ),
+                ),
 
-                  TextFormField(
-                    controller: dateAfterInput,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      final DateTime? selectedDate = await showDatePicker(context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(0),
-                          lastDate: DateTime(9999));
-                      dateAfterInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
-                    },
+                TextFormField(
+                  controller: dateAfterInput,
+                  onTap: () async {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    final DateTime? selectedDate = await showDatePicker(context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(0),
+                        lastDate: DateTime(9999));
+                    dateAfterInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+                  },
 
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
-                        hintText: DateFormat.yMMMEd().format(DateTime.now()),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
+                  decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                      hintText: DateFormat.yMMMEd().format(DateTime.now()),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          width: 0,
+                          style: BorderStyle.none,
                         ),
-                        filled: true,
-                        fillColor: Colors.white
-                    ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white
                   ),
+                ),
 
-                  TextFormField(
-                    controller: timeAfterInput,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      final TimeOfDay? selectedTime = await showTimePicker(context: context,
-                          initialTime: TimeOfDay.now()
-                      );
+                TextFormField(
+                  controller: timeAfterInput,
+                  onTap: () async {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    final TimeOfDay? selectedTime = await showTimePicker(context: context,
+                        initialTime: TimeOfDay.now()
+                    );
 
-                      DateTime formattedTime(TimeOfDay today){
-                        final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
-                        return newTime;
-                      }
-                      timeAfterInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
-                    },
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(left: 20, right: 20),
-                        hintText: DateFormat.jm().format(DateTime.now().add(const Duration(hours: 2))),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
+                    DateTime formattedTime(TimeOfDay today){
+                      final newTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, today.hour, today.minute);
+                      return newTime;
+                    }
+                    timeAfterInput.text = DateFormat('hh:mm:ss').format(formattedTime(selectedTime!));
+                  },
+                  decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.only(left: 20, right: 20),
+                      hintText: DateFormat.jm().format(DateTime.now().add(const Duration(hours: 2))),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          width: 0,
+                          style: BorderStyle.none,
                         ),
-                        filled: true,
-                        fillColor: Colors.white
-                    ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white
                   ),
+                ),
 
 
-                ],
-              ),
+              ],
             ),
-
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: const Text("OK"),
               onPressed: () => _formEditEventKey.currentState!.validate() ? editData(appointmentDetails.id) : null,
             ),
-            FlatButton(
+            TextButton(
               child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -487,21 +484,21 @@ class _CalendarPageState extends State<CalendarApp> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        TextFormField(controller: titleInput,
-                            textInputAction: TextInputAction.next,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            validator: (title) {
-                              if (title == null || title.isEmpty) {
-                                return 'Please enter a title.';
-                              } else {
-                                return null;
-                              }
-                            },
-                            decoration: InputDecoration(
-                                hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Event Title"),
+                        TextFormField(
+                          controller: titleInput,
+                          textInputAction: TextInputAction.next,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (title) {
+                            if (title == null || title.isEmpty) {
+                              return 'Please enter a title.';
+                            } else {
+                              return null;
+                            }},
+                          decoration: InputDecoration(
+                              hintStyle: TextStyle(color: Colors.grey[800]),
+                              hintText: "Event Title"),
                         ),
                         TextFormField(
                           controller: dateBeforeInput,
@@ -562,7 +559,7 @@ class _CalendarPageState extends State<CalendarApp> {
                             FocusScope.of(context).requestFocus(FocusNode());
                             final DateTime? selectedDate = await showDatePicker(context: context,
                                 initialDate: DateTime.now(),
-                                firstDate: DateTime(0),
+                                firstDate: DateTime.now().add(const Duration(hours: -1)),
                                 lastDate: DateTime(9999));
                             dateAfterInput.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
                           },
@@ -618,11 +615,11 @@ class _CalendarPageState extends State<CalendarApp> {
 
                 ),
                 actions: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: const Text("OK"),
                     onPressed: () => _formAddEventKey.currentState!.validate() ? addData() : null,
                   ),
-                  FlatButton(
+                  TextButton(
                     child: const Text("Cancel"),
                     onPressed: () {
                       Navigator.of(context).pop();
