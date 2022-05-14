@@ -191,6 +191,8 @@ class _profilePageState extends State<profilePage> {
                                       return 'Please enter a nickname.';
                                     } else if (nicknameCheck == box.get('nickname')){
                                       return 'Nickname cannot be similar.';
+                                    } else if (nicknameCheck.trim().length > 10){
+                                      return 'Nickname too long. Max 10 chars.';
                                     } else {
                                       return null;
                                     }

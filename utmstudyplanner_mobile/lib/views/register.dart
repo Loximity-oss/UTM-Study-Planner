@@ -169,7 +169,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Matric ID/Staff ID",
+                                hintText: "Matric ID/Staff ID (required)",
                                 fillColor: Colors.white),
                           ),
 
