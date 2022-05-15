@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/services.dart';
+import 'package:utmstudyplanner_mobile/views/login/login.dart';
+import '../../server/conn.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/register.dart';
+import 'package:http/http.dart' as http;
 
 class registerPage extends StatefulWidget {
   const registerPage({Key? key}) : super(key: key);
@@ -12,13 +17,72 @@ class registerPage extends StatefulWidget {
 }
 
 class _registerPageState extends State<registerPage> {
+  final TextEditingController IDInput = TextEditingController();
   final TextEditingController nameInput = TextEditingController();
   final TextEditingController courseInput = TextEditingController();
   final TextEditingController emailInput = TextEditingController();
-  final TextEditingController usernameInput = TextEditingController();
-  TextEditingController passwordInput = TextEditingController();
+  final TextEditingController passwordInput = TextEditingController();
+  final TextEditingController confirm_password = TextEditingController();
   final _formRegisterKey = GlobalKey<FormState>();
   bool visible = false;
+
+  Future userRegister() async {
+    // Getting value from Controller
+
+    String inputID = IDInput.text;
+    String inputEmail = emailInput.text;
+    String inputName = nameInput.text;
+    String inputCourse = courseInput.text;
+    String inputPassword = passwordInput.text;
+
+    //TODO implement conn checking
+    var db = Mysql();
+    String query = 'INSERT INTO `users`(`id`, `email`, `name`, `coursecode`, `password`) VALUES ("' +
+        inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse +
+        '","' + inputPassword + '")';
+    print(query);
+    try{
+      var result = await db.execQuery(query);
+      print(result.affectedRows);
+      print(result.numOfRows);
+      if (result.affectedRows.toInt() == 1) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Data has been successfully inserted into the database.'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {}
+    }catch(e){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +121,7 @@ class _registerPageState extends State<registerPage> {
                       child: Column(
                         children:  <Widget>[
                           TextFormField(
+                            controller: emailInput,
                             style: const TextStyle(fontSize: 14),
                             textInputAction: TextInputAction.next,
                             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -81,6 +146,7 @@ class _registerPageState extends State<registerPage> {
                           //Matric ID/Staff ID
                           const SizedBox(height: 10),
                           TextFormField(
+                            controller: IDInput,
                             style: const TextStyle(fontSize: 14),
                             textInputAction: TextInputAction.next,
                             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -112,6 +178,7 @@ class _registerPageState extends State<registerPage> {
                           //Nickname
                           const SizedBox(height: 10),
                           TextFormField(
+                            controller: nameInput,
                             style: const TextStyle(fontSize: 14),
                             textInputAction: TextInputAction.next,
                             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -176,6 +243,8 @@ class _registerPageState extends State<registerPage> {
                             obscureText: true,
                             textInputAction: TextInputAction.next,
                             autovalidateMode: AutovalidateMode.onUserInteraction,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9,A-Z,a-z,!@#$*]'))],
                             validator: (passwordCheck) {
                               if (passwordCheck == null || passwordCheck.isEmpty) {
                                 return 'Please enter a password.';
@@ -183,6 +252,8 @@ class _registerPageState extends State<registerPage> {
                               if (passwordCheck.trim().length < 8){
                                 return 'Password must be at least 8 characters.';
                               }
+                              if (!passwordCheck.contains(RegExp(r"[0-9]"))) return 'Insert at least one number: "0-9"';
+                              if (!passwordCheck.contains(RegExp(r'[!@#$%^&*]'))) return 'Insert at least one special character: "!@#*&"';
                               return null;
                             },
                             decoration: InputDecoration(
@@ -202,13 +273,43 @@ class _registerPageState extends State<registerPage> {
                                 fillColor: Colors.white),
                           ),
 
+                          //Confirm Password
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: confirm_password,
+                            obscureText: true,
+                            textInputAction: TextInputAction.next,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            validator: (passwordCheck) {
+                              if (passwordCheck != passwordInput.text){
+                                return 'Password does not match';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 20, right: 20),
+
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: const BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+
+                                  ),
+                                ),
+                                filled: true,
+                                hintStyle: TextStyle(color: Colors.grey[800]),
+                                hintText: "Password Checker",
+                                fillColor: Colors.white),
+                          ),
+
 
                           TextButton(
                             child:
                             const Text("Have an account? Click me!", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             onPressed: () {
                               Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => const registerPage()),
+                                MaterialPageRoute(builder: (context) => const loginPage()),
                               );
                             },
                           ),
@@ -220,7 +321,7 @@ class _registerPageState extends State<registerPage> {
                               color: const Color.fromARGB(255, 93, 6, 29),
                             ),
                             child: MaterialButton(
-                              onPressed: () => _formRegisterKey.currentState!.validate() ? null : null,
+                              onPressed: () => _formRegisterKey.currentState!.validate() ? userRegister() : null,
                               child: const Text('Register',
                                 style: TextStyle(
                                   fontSize: 18,
