@@ -9,9 +9,6 @@ import 'package:utmstudyplanner_mobile/server/conn.dart';
 import 'views/login/login.dart';
 import 'views/home/homescreen.dart';
 
-
-
-
 void main() async{
   await Hive.initFlutter();
   await Hive.openBox('');
@@ -38,6 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
       String query = 'SELECT * FROM `users` WHERE `email` = "'+ a +'" AND password = "' + b + '"';
       var result = await db.execQuery(query);
 
+      
       //todo shorten
       if(result.numOfRows == 1){
         Timer(const Duration(seconds: 5),
@@ -50,6 +48,12 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         box.put('email', '');
         box.put('password', '');
+
+        box.put('nickname', '');
+        box.put('matricID','');
+        box.put('image','');
+        box.put('coursecode','');
+
         Timer(const Duration(seconds: 5),
                 ()=>Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
@@ -59,8 +63,6 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     } else {
-      box.put('email', '');
-      box.put('password', '');
       Timer(const Duration(seconds: 5),
               ()=>Navigator.pushReplacement(context,
               MaterialPageRoute(builder:
@@ -82,6 +84,9 @@ class _SplashScreenState extends State<SplashScreen> {
     if(box.get('firstLaunchKey') ?? true){
       box.put('password', '');
       box.put('email', '');
+      box.put('nickname', '');
+      box.put('matricID','');
+      box.put('coursecode','');
       Timer(const Duration(seconds: 5),
               ()=>Navigator.pushReplacement(context,
               MaterialPageRoute(builder:

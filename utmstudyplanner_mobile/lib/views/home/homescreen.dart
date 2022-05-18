@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
-import 'package:utmstudyplanner_mobile/views/login/login.dart';
-import 'package:utmstudyplanner_mobile/views/home/calendarv2.dart';
-import 'package:utmstudyplanner_mobile/views/notifications/TestNotifyScreen.dart';
+import 'package:utmstudyplanner_mobile/views/home/drawer.dart';
+
+import '../../server/conn.dart';
 
 class homepage extends StatefulWidget{
   const homepage({Key? key}) : super(key: key);
@@ -26,92 +25,7 @@ class _homepageState extends State<homepage>{
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 249, 235),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 93, 6, 29),
-              ),
-              child: Text('UTM Study Planner', style: TextStyle(color: Colors.white)),
-            ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.house, color: Colors.black),
-              title: const Text('Home'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.calendar, color: Colors.black),
-              title: const Text('Calendar'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const CalendarApp()
-                    ));
-              },
-            ),
-            ListTile(
-              leading: const FaIcon(FontAwesomeIcons.bell, color: Colors.black),
-              title: const Text('Notifications Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => TestNotifyScreen()
-                    ));
-              },
-            ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.gear, color: Colors.black),
-              title: const Text('Settings'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            Container(
-              child: Align(
-                  alignment: FractionalOffset.bottomCenter,
-                  child: Column(
-                    children: [
-                      Divider(),
-                      ListTile(
-                          leading: const FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, color: Colors.black),
-                          title: const Text('Logout'),
-                          onTap: () => showDialog(context: context, builder: (BuildContext context) => AlertDialog(
-                            title: const Text('Logout'),
-                            content: const Text('Would you like to log out?'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  box.put('username', '');
-                                  box.put('password', '');
-                                  Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => loginPage()),
-                                  );
-                                },
-                                child: const Text('Yes'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, 'No'),
-                                child: const Text('No'),
-                              ),
-                            ],
-                          ))
-                      ),
-                    ],
-                  )
-              ),
-            ),
-          ],
-        ),
-      ),
-
-
-
+      drawer: DefAppBar(),
       body: NestedScrollView( //where appBar resides
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return <Widget>[
@@ -142,38 +56,37 @@ class _homepageState extends State<homepage>{
             SliverList(
               delegate: SliverChildListDelegate(
                 [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(5.0, 15.0, 5.0, 20.0),
-                    height: 200,
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 93, 6, 29),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(30.0),
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(image: AssetImage('assets/Profile/default.png')),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Container(child: Text('User',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), )), //TODO: link with backend
-                        Container(child: Text('B21ECXXXX',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
-                        Container(child: Text('3/SECJH',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
-
-                      ],
+                Container(
+                  padding: const EdgeInsets.fromLTRB(5.0, 15.0, 5.0, 20.0),
+                  height: 200,
+                  decoration: const BoxDecoration(
+                    color: Color.fromARGB(255, 93, 6, 29),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30.0),
                     ),
                   ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(image: AssetImage('assets/Profile/default.png')),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(child: Text(box.get('nickname'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), )), //TODO: link with backend
+                      Container(child: Text(box.get('matricID'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
+                      Container(child: Text(box.get('coursecode'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
+
+                    ],
+                  ),
+                ),
                 ],
               ),
             ),
-
 
             //Todo List Section
             SliverList(

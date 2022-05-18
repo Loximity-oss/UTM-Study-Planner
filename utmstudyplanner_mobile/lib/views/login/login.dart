@@ -35,21 +35,56 @@ class _loginPageState extends State<loginPage> {
     String email = emailInput.text;
     String password = passwordInput.text;
 
-    //TODO implement conn checking
-    var db = Mysql();
-    String query = 'SELECT * FROM `users` WHERE `email` = "'+ email +'" AND password = "' + password + '"';
-    var result = await db.execQuery(query);
-    if(result.numOfRows == 1){
-      box.put('email', email);
-      box.put('password', password);
-      Timer(const Duration(seconds: 5),
-              ()=>Navigator.pushReplacement(context,
-              MaterialPageRoute(builder:
-                  (context) => homepage()
-              )
-          )
-      );
-    } else {
+    // clearly there is a better way to do this
+    // but this is for SP2 presentation.
+    // will change using future later.
+
+    try{
+      var db = Mysql();
+      String query = 'SELECT * FROM `users` WHERE `email` = "'+ email +'" AND password = "' + password + '"';
+      var result = await db.execQuery(query);
+      if(result.numOfRows == 1){
+        box.put('email', email);
+        box.put('password', password);
+
+        // clearly there is a better way to do this
+        // but this is for SP2 presentation.
+        // will change using future later.
+
+
+        for(final row in result.rows){
+          box.put('nickname', row.colAt(2));
+          box.put('matricID',row.colAt(0));
+          box.put('coursecode',row.colAt(3));
+        }
+
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const homepage()
+            ));
+
+
+      } else {
+        setState(() {
+          visible = false ;
+        });
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Username or Password is incorrect.'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e){
       setState(() {
         visible = false ;
       });
@@ -57,7 +92,7 @@ class _loginPageState extends State<loginPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Username or Password is incorrect.'),
+            title: Text(e.toString()),
             actions: <Widget>[
               FlatButton(
                 child: const Text("OK"),
