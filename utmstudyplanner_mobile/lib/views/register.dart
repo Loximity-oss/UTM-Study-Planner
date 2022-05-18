@@ -43,8 +43,12 @@ class _registerPageState extends State<registerPage> {
     print(query);
     try{
       var result = await db.execQuery(query);
-      print(result.affectedRows);
-      print(result.numOfRows);
+      IDInput.clear();
+      emailInput.clear();
+      nameInput.clear();
+      courseInput.clear();
+      passwordInput.clear();
+      confirm_password.clear();
       if (result.affectedRows.toInt() == 1) {
         showDialog(
           context: context,
@@ -55,6 +59,7 @@ class _registerPageState extends State<registerPage> {
                 FlatButton(
                   child: const Text("OK"),
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.of(context).pop();
                   },
                 ),
@@ -139,7 +144,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Email",
+                                hintText: "Email (required)",
                                 fillColor: Colors.white),
                           ),
 
@@ -170,7 +175,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Matric ID/Staff ID",
+                                hintText: "Matric ID/Staff ID (required)",
                                 fillColor: Colors.white),
                           ),
 
@@ -184,7 +189,7 @@ class _registerPageState extends State<registerPage> {
                             autovalidateMode: AutovalidateMode.onUserInteraction,
                             validator: (nicknameCheck) {
                               if (nicknameCheck == null || nicknameCheck.isEmpty) {
-                                return 'Please enter a nickname.';
+                                return 'Please enter a nickname. (required)';
                               }
                               return null;
                             },
@@ -199,7 +204,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Nickname",
+                                hintText: "Nickname (required)",
                                 fillColor: Colors.white),
                           ),
 
@@ -231,7 +236,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Course Code e.g. 1/SECRH",
+                                hintText: "Course Code e.g. 1/SECRH (required)",
                                 fillColor: Colors.white),
                           ),
 
@@ -240,6 +245,7 @@ class _registerPageState extends State<registerPage> {
                           const SizedBox(height: 10),
                           TextFormField(
                             controller: passwordInput,
+                            style: const TextStyle(fontSize: 14),
                             obscureText: true,
                             textInputAction: TextInputAction.next,
                             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -269,7 +275,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Password",
+                                hintText: "Password (required)",
                                 fillColor: Colors.white),
                           ),
 
@@ -277,6 +283,7 @@ class _registerPageState extends State<registerPage> {
                           const SizedBox(height: 10),
                           TextFormField(
                             controller: confirm_password,
+                            style: const TextStyle(fontSize: 14),
                             obscureText: true,
                             textInputAction: TextInputAction.next,
                             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -299,7 +306,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Password Checker",
+                                hintText: "Confirm Password (required)",
                                 fillColor: Colors.white),
                           ),
 

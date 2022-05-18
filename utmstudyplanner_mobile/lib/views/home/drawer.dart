@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
-import 'package:utmstudyplanner_mobile/views/home/profile.dart';
 import 'package:utmstudyplanner_mobile/views/home/profilev2.dart';
 import '../login/login.dart';
 import '../notifications/TestNotifyScreen.dart';

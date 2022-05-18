@@ -41,6 +41,7 @@ dependencies:
   syncfusion_flutter_calendar: ^20.1.52
   mysql_client: ^0.0.16
   intl: ^0.17.0
+  date_time_picker: ^2.1.0
 
 dev_dependencies:
   flutter_test:

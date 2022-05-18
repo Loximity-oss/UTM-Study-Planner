@@ -382,16 +382,21 @@ class _profilePageState extends State<profilePageV2> {
                                 textInputAction: TextInputAction.next,
                                 decoration: const InputDecoration(hintText: 'New Password'),
                                 autovalidateMode: AutovalidateMode.onUserInteraction,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9,A-Z,a-z,!@#$*]'))],
                                 validator: (passwordCheck) {
                                   if (passwordCheck == null || passwordCheck.isEmpty) {
                                     return 'Please enter a password.';
-                                  } else if (passwordCheck == box.get('nickname')){
-                                    return 'Password cannot be similar.';
-                                  } else if (passwordCheck.trim().length < 8){
-                                    return 'Password must be at least 8 characters.';
-                                  } else {
-                                    return null;
                                   }
+                                  if (passwordCheck.trim().length < 8){
+                                    return 'Password must be at least 8 characters.';
+                                  }
+                                  if (passwordCheck == box.get('password')){
+                                    return 'Password cannot be similar.';
+                                  }
+                                  if (!passwordCheck.contains(RegExp(r"[0-9]"))) return 'Insert at least one number: "0-9"';
+                                  if (!passwordCheck.contains(RegExp(r'[!@#$%^&*]'))) return 'Insert at least one special character: "!@#*&"';
+                                  return null;
                                 },
                               ),
                               TextFormField(
