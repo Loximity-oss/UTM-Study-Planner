@@ -299,7 +299,7 @@ class _registerPageState extends State<registerPage> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
-                                hintText: "Password Checker",
+                                hintText: "Confirm Password",
                                 fillColor: Colors.white),
                           ),
 
