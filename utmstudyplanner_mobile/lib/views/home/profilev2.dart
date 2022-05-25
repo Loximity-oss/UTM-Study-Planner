@@ -22,10 +22,15 @@ class _profilePageState extends State<profilePageV2> {
 
   bool visible = false;
 
-
   Future changePassword() async{
     var db = Mysql();
-    String query = 'UPDATE `users` SET `password` = "'+ passwordInput.text +'" WHERE `users`.`id` = "'+ box.get("matricID") +'"';
+    String query = 'UPDATE users as T1' +
+    ' INNER JOIN (SELECT `password`, `password_2`, `password_3` FROM users WHERE id = "'+ box.get("matricID") +'" ''AND `password_2` NOT LIKE "%'+ passwordInput.text +'%" AND `password_3` NOT LIKE "%'+ passwordInput.text +'%") as T2' +
+    ' SET T1.password = "'+ passwordInput.text +'",'+
+    ' T1.password_2 = T2.password,' +
+    ' T1.password_3 = T2.password_2' +
+    ' WHERE T1.id = "'+ box.get("matricID") +'"';
+
     try{
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {
@@ -49,7 +54,28 @@ class _profilePageState extends State<profilePageV2> {
             );
           },
         );
+      } else {
+        passwordInput.clear();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('You cannot use a previous password'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {});
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
+
+
     }catch(e){
       showDialog(
         context: context,
