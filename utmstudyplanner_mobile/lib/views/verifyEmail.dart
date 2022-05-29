@@ -1,28 +1,62 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:email_auth/email_auth.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/login/login.dart';
 import 'package:utmstudyplanner_mobile/views/register.dart';
-
 import '../../server/conn.dart';
 import 'package:http/http.dart' as http;
 
+
 class verifyEmail extends StatefulWidget {
-  const verifyEmail({Key? key}) : super(key: key);
+
+  verifyEmail({Key? key}) : super(key: key);
+
+
 
   @override
   State<verifyEmail> createState() => _verifyEmail();
 }
 
+
+
 class _verifyEmail extends State<verifyEmail> {
+
+
   @override
   final box = Hive.box('');
   final TextEditingController emailInput = TextEditingController();
   final TextEditingController passwordInput = TextEditingController();
+  final TextEditingController userOTP = TextEditingController();
   final _formLoginKey = GlobalKey<FormState>();
   bool visible = false;
+
+  EmailAuth emailAuth =  new EmailAuth(sessionName: "Sample session");
+
+  void sendOtp() async {
+    var res = await emailAuth.sendOtp(
+        recipientMail: emailInput.text, otpLength: 5);
+    if(res){
+      print("OTP Sent.");
+    }
+    else{
+      print("OTP not sent.");
+    }
+  }
+
+  void verifyOTP() {
+    var res = emailAuth.validateOtp(recipientMail: emailInput.text, userOtp: userOTP.text);
+    if (res){
+      print("OTP verified");
+    }
+    else{
+      print("Invalid OTP");
+    }
+  }
+
+
 
   Future userLogin() async{
 
@@ -107,6 +141,8 @@ class _verifyEmail extends State<verifyEmail> {
   }
 
 
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 249, 235),
@@ -150,13 +186,14 @@ class _verifyEmail extends State<verifyEmail> {
                                 ),
                                 suffixIcon: TextButton(
                                   child: const Text("Send OTP"),
-                                  onPressed: () => verifyEmail(),
+                                  onPressed: () => sendOtp(),
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
                                 hintText: "OTP",
                                 fillColor: Colors.white),
                           ),
+
 
                           Container(
                             width: MediaQuery.of(context).size.width / 2.0,
@@ -166,8 +203,8 @@ class _verifyEmail extends State<verifyEmail> {
                               color: const Color.fromARGB(255, 93, 6, 29),
                             ),
                             child: MaterialButton(
-                              onPressed: () => _formLoginKey.currentState!.validate() ? userLogin() : null,
-                              child: const Text('Login',
+                              onPressed: () => verifyOTP(),
+                              child: const Text('Verify OTP',
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: Colors.white,

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/services.dart';
 import 'package:utmstudyplanner_mobile/views/login/login.dart';
-import 'package:utmstudyplanner_mobile/views/verifyEmail-otp.dart';
 import '../../server/conn.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/register.dart';
@@ -314,16 +313,6 @@ class _registerPageState extends State<registerPage> {
                               );
                             },
                           ),
-
-                          TextButton(
-                            child:
-                            const Text("Test for verify email", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                            onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => const verifyEmail()),
-                              );
-                            },
-                          ),
                           Container(
                             width: MediaQuery.of(context).size.width / 2.0,
                             height: 40,
@@ -354,8 +343,6 @@ class _registerPageState extends State<registerPage> {
                   ],
                 ),
               ),
-
-
 
             ],
           ),
