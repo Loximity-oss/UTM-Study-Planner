@@ -4,7 +4,6 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/register.dart';
-import 'package:utmstudyplanner_mobile/views/verifyEmail.dart';
 
 import '../../server/conn.dart';
 import '../home/homescreen.dart';
@@ -185,16 +184,6 @@ class _loginPageState extends State<loginPage> {
                             onPressed: () {
                               Navigator.push(context,
                                 MaterialPageRoute(builder: (context) => const registerPage()),
-                              );
-                            },
-                          ),
-
-                          TextButton(
-                            child:
-                            const Text("test", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                            onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => verifyEmail()),
                               );
                             },
                           ),

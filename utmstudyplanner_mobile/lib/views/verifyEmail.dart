@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:email_auth/email_auth.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:utmstudyplanner_mobile/views/login/login.dart';
-import 'package:utmstudyplanner_mobile/views/register.dart';
 import '../../server/conn.dart';
 import 'package:http/http.dart' as http;
 
@@ -28,7 +25,6 @@ class _verifyEmail extends State<verifyEmail> {
   @override
   final box = Hive.box('');
   final TextEditingController emailInput = TextEditingController();
-  final TextEditingController passwordInput = TextEditingController();
   final TextEditingController userOTP = TextEditingController();
   final _formLoginKey = GlobalKey<FormState>();
   bool visible = false;
@@ -58,89 +54,6 @@ class _verifyEmail extends State<verifyEmail> {
 
 
 
-  Future userLogin() async{
-
-    setState(() {
-      visible = true;
-
-    });
-    // Getting value from Controller
-    String email = emailInput.text;
-    String password = passwordInput.text;
-
-    // clearly there is a better way to do this
-    // but this is for SP2 presentation.
-    // will change using future later.
-
-    try{
-      var db = Mysql();
-      String query = 'SELECT * FROM `users` WHERE `email` = "'+ email +'" AND password = "' + password + '"';
-      var result = await db.execQuery(query);
-      if(result.numOfRows == 1){
-        box.put('email', email);
-        box.put('password', password);
-
-        // clearly there is a better way to do this
-        // but this is for SP2 presentation.
-        // will change using future later.
-
-
-        for(final row in result.rows){
-          box.put('nickname', row.colAt(2));
-          box.put('matricID',row.colAt(0));
-          box.put('coursecode',row.colAt(3));
-        }
-
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const loginPage()
-            ));
-
-
-      } else {
-        setState(() {
-          visible = false ;
-        });
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Username or Password is incorrect.'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e){
-      setState(() {
-        visible = false ;
-      });
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(e.toString()),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
-
 
 
   Widget build(BuildContext context) {
@@ -152,9 +65,9 @@ class _verifyEmail extends State<verifyEmail> {
           child: Column(
             children: <Widget>[
               Container(
-                width: 300,
+                width: 500,
                 height: 300,
-                child: Image.asset('assets/signup/mobile_1.png'),
+                child: Image.asset('assets/verify_email/hand_verify.png'),
               ),
               //Username and Password Containers
               Container(
@@ -170,11 +83,6 @@ class _verifyEmail extends State<verifyEmail> {
                         children:  <Widget>[
                           TextFormField(controller: emailInput,
                             style: const TextStyle(fontSize: 14),
-                            textInputAction: TextInputAction.next,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            validator: (value) => EmailValidator.validate(value!) ? null : "Please enter a valid email",
-                            enableSuggestions: false,
-                            autocorrect: false,
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.only(left: 20, right: 20),
                                 border: OutlineInputBorder(
@@ -193,6 +101,18 @@ class _verifyEmail extends State<verifyEmail> {
                                 hintText: "OTP",
                                 fillColor: Colors.white),
                           ),
+
+                          const SizedBox(height: 20),
+                          Visibility(
+                              visible: visible,
+                              child: Container(
+                                  margin: const EdgeInsets.only(bottom: 30),
+                                  child: const CircularProgressIndicator(color: Color.fromARGB(255, 93, 6, 29))
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
 
 
                           Container(
@@ -215,17 +135,8 @@ class _verifyEmail extends State<verifyEmail> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
-                    Visibility(
-                        visible: visible,
-                        child: Container(
-                            margin: const EdgeInsets.only(bottom: 30),
-                            child: const CircularProgressIndicator(color: Color.fromARGB(255, 93, 6, 29))
-                        )
-                    ),
-                  ],
-                ),
-              ),
+
+
 
             ],
           ),
