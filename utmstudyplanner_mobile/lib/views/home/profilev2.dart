@@ -1,7 +1,6 @@
-import 'package:email_validator/email_validator.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/server/conn.dart';
 
@@ -173,7 +172,7 @@ class _profilePageState extends State<profilePageV2> {
                   children: <Widget>[
                     const CircleAvatar(
                       backgroundImage: AssetImage('assets/Profile/default.png'),
-                      radius: 50.0,
+                      radius: 55.0,
                     ),
                     const SizedBox(
                       height: 10.0,

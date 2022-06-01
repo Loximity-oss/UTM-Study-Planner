@@ -68,13 +68,9 @@ class _homepageState extends State<homepage>{
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(image: AssetImage('assets/Profile/default.png')),
-                        ),
+                      CircleAvatar(
+                        radius: 55.0,
+                        backgroundImage: AssetImage('assets/Profile/default.png'),
                       ),
                       SizedBox(height: 10),
                       Container(child: Text(box.get('nickname'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), )), //TODO: link with backend
