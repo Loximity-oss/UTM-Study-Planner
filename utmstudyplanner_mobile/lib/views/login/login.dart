@@ -41,7 +41,7 @@ class _loginPageState extends State<loginPage> {
 
     try{
       var db = Mysql();
-      String query = 'SELECT * FROM `users` WHERE `email` = "'+ email +'" AND password = "' + password + '"';
+      String query = 'SELECT `id`,`email`, `name`, `coursecode`, `password` FROM `users` WHERE `email` = "'+ email +'" AND `password` = "' + password + '"';
       var result = await db.execQuery(query);
       if(result.numOfRows == 1){
         box.put('email', email);
@@ -50,7 +50,7 @@ class _loginPageState extends State<loginPage> {
         // clearly there is a better way to do this
         // but this is for SP2 presentation.
         // will change using future later.
-
+        print(query);
 
         for(final row in result.rows){
           box.put('nickname', row.colAt(2));

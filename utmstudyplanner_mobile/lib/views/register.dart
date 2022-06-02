@@ -40,7 +40,7 @@ class _registerPageState extends State<registerPage> {
 
     if(_image != null){
       final bytes = _image?.readAsBytesSync();
-     img64 = base64Encode(bytes!);
+      img64 = base64Encode(bytes!);
     } else {
       img64 = '';
     }
@@ -143,7 +143,7 @@ class _registerPageState extends State<registerPage> {
                               radius: 60.0,
                               child: ClipOval(
                                 child: SizedBox(
-                                  child: (_image!=null)?Image.file(
+                                  child: (_image!=null)? Image.file(
                                     _image!,
                                     fit: BoxFit.fill,
                                   ):Image.asset(

@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/server/conn.dart';
-
 
 class profilePageV2 extends StatefulWidget {
   const profilePageV2({Key? key}) : super(key: key);
@@ -18,8 +22,35 @@ class _profilePageState extends State<profilePageV2> {
   final TextEditingController passwordInput = TextEditingController();
   final _formNicknameKey = GlobalKey<FormState>();
   final _formPasswordKey = GlobalKey<FormState>();
+  final picker = ImagePicker();
+
+  String? _image;
+  File? _image2;
 
   bool visible = false;
+
+  void loadProfilePic() async {
+    var db = Mysql();
+    try{
+      String query = 'SELECT profilePicture FROM `users` WHERE `email` = "'+ box.get('email') +'" AND password = "' + box.get('password') + '"';
+
+      var result = await db.execQuery(query);
+      for (final row in result.rows) {
+        final s = row.colAt(0);
+        setState(() {
+          _image = s;
+        });
+
+      }
+
+    } catch (e){
+      print(e.toString());
+    }
+  }
+
+  Future changeProfile() async{
+
+  }
 
   Future changePassword() async{
     var db = Mysql();
@@ -143,6 +174,12 @@ class _profilePageState extends State<profilePageV2> {
   }
 
   @override
+  void initState()  {
+    super.initState();
+    loadProfilePic();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -170,9 +207,18 @@ class _profilePageState extends State<profilePageV2> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const CircleAvatar(
-                      backgroundImage: AssetImage('assets/Profile/default.png'),
-                      radius: 55.0,
+                    CircleAvatar(
+                      radius: 50.0,
+                      child: ClipOval(
+                        child: SizedBox(
+                          child: (_image!=null) ? Image.memory(base64Decode(_image!),
+                            fit: BoxFit.fill,
+                          ):Image.asset(
+                            "assets/Profile/default.png",
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(
                       height: 10.0,
@@ -482,6 +528,96 @@ class _profilePageState extends State<profilePageV2> {
                   ),
                 ),
               )
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          Container(
+              width: 300.0,
+              child: RaisedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Change Profile'),
+                        content: Form(
+                          key: _formPasswordKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () async {
+                                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                  setState(() {
+                                    if (pickedFile != null) {
+                                      _image2 = File(pickedFile.path);
+                                      log(_image2.toString());
+                                    } else {
+                                      print('No image selected.');
+                                    }
+                                  });
+                                },
+                                child: CircleAvatar(
+                                  radius: 60.0,
+                                  child: ClipOval(
+                                    child: SizedBox(
+                                      child: (_image2!=null)? Image.file(
+                                        _image2!,
+                                        fit: BoxFit.fill,
+                                      ):Image.asset(
+                                        "assets/Profile/default.png",
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text("OK"),
+                            onPressed: () => _formPasswordKey.currentState!.validate() ? changePassword() : null,
+                          ),
+                          TextButton(
+                            child: const Text("Cancel"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+
+                      );
+                    },
+                  );
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(80.0)
+                ),
+                elevation: 0.0,
+                padding: const EdgeInsets.all(0.0),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                      colors: [Colors.redAccent, Colors.pinkAccent],
+                    ),
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                    alignment: Alignment.center,
+                    child: const Text("Change Profile Image", style: TextStyle(color: Colors.white, fontSize: 26.0, fontWeight: FontWeight.w300)),
+                  ),
+                ),
+              )
+          ),
+          const SizedBox(
+            height: 20.0,
           ),
         ],
       ),

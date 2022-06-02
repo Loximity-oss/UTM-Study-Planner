@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
     //TODO corruption check
     if(a.isNotEmpty && b.isNotEmpty){
       var db = Mysql();
-      String query = 'SELECT * FROM `users` WHERE `email` = "'+ a +'" AND password = "' + b + '"';
+      String query = 'SELECT `email`, `password` FROM `users` WHERE `email` = "'+ a +'" AND password = "' + b + '"';
       var result = await db.execQuery(query);
 
       
