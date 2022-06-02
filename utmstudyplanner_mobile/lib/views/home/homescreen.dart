@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/home/drawer.dart';
 
 import '../../server/conn.dart';
 
-class homepage extends StatefulWidget{
+class homepage extends StatefulWidget {
   const homepage({Key? key}) : super(key: key);
 
   @override
   State<homepage> createState() => _homepageState();
 }
 
-class _homepageState extends State<homepage>{
+class _homepageState extends State<homepage> {
   final GlobalKey<ScaffoldState> _homepageKey = GlobalKey<ScaffoldState>();
   final box = Hive.box('');
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
   }
 
@@ -26,7 +27,8 @@ class _homepageState extends State<homepage>{
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 249, 235),
       drawer: DefAppBar(),
-      body: NestedScrollView( //where appBar resides
+      body: NestedScrollView(
+        //where appBar resides
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
@@ -43,47 +45,72 @@ class _homepageState extends State<homepage>{
                         ),
                       ),
                     ),
-                    preferredSize: Size.fromHeight(kToolbarHeight + 150)
-                ),
+                    preferredSize: Size.fromHeight(kToolbarHeight + 150)),
               ),
               floating: false,
               pinned: false,
             ),
           ];
         },
-        body: CustomScrollView( // main content
+        body: CustomScrollView(
+          // main content
           slivers: <Widget>[
             SliverList(
               delegate: SliverChildListDelegate(
                 [
-                Container(
-                  padding: const EdgeInsets.fromLTRB(5.0, 15.0, 5.0, 20.0),
-                  height: 200,
-                  decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 93, 6, 29),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30.0),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(5.0, 15.0, 5.0, 20.0),
+                    height: 200,
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 93, 6, 29),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30.0),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image:
+                                    AssetImage('assets/Profile/default.png')),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                            child: Text(
+                          box.get('nickname'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        )), //TODO: link with backend
+                        Container(
+                            child: Text(
+                          box.get('matricID'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                          ),
+                        )),
+                        Container(
+                            child: Text(
+                          box.get('coursecode'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                          ),
+                        )),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(image: AssetImage('assets/Profile/default.png')),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(child: Text(box.get('nickname'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), )), //TODO: link with backend
-                      Container(child: Text(box.get('matricID'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
-                      Container(child: Text(box.get('coursecode'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
-
-                    ],
-                  ),
-                ),
                 ],
               ),
             ),
@@ -100,16 +127,14 @@ class _homepageState extends State<homepage>{
                         Text(
                           "My Tasks",
                           style: TextStyle(
-                              color: Color.fromARGB(255, 16, 38 ,65),
+                              color: Color.fromARGB(255, 16, 38, 65),
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign.start,
                         ),
-
                       ],
                     ),
                   ),
-
                   Container(
                     padding: const EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
                     child: Column(
@@ -117,14 +142,16 @@ class _homepageState extends State<homepage>{
                       children: const <Widget>[
                         ListTile(
                           leading: FaIcon(FontAwesomeIcons.solidClock,
-                              size: 25, color: Color.fromARGB(255, 228, 99, 113)),
+                              size: 25,
+                              color: Color.fromARGB(255, 228, 99, 113)),
                           title: Text(
                             'To Do',
                             style: TextStyle(
                                 color: Color.fromARGB(255, 65, 72, 101),
                                 fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text('None',
+                          subtitle: Text(
+                            'None',
                             style: TextStyle(
                               color: Color.fromARGB(255, 166, 169, 166),
                             ),
@@ -133,7 +160,6 @@ class _homepageState extends State<homepage>{
                       ],
                     ),
                   ),
-
                   Container(
                     padding: const EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
                     child: Column(
@@ -141,23 +167,24 @@ class _homepageState extends State<homepage>{
                       children: const <Widget>[
                         ListTile(
                           leading: FaIcon(FontAwesomeIcons.circleExclamation,
-                              size: 25, color: Color.fromARGB(255, 248, 191, 122)),
+                              size: 25,
+                              color: Color.fromARGB(255, 248, 191, 122)),
                           title: Text(
                             'In Progress',
                             style: TextStyle(
                                 color: Color.fromARGB(255, 65, 72, 101),
                                 fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text('None',
+                          subtitle: Text(
+                            'None',
                             style: TextStyle(
-                              color: Color.fromARGB(255, 166,169,166),
+                              color: Color.fromARGB(255, 166, 169, 166),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
                   Container(
                     padding: const EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
                     child: Column(
@@ -165,23 +192,24 @@ class _homepageState extends State<homepage>{
                       children: const <Widget>[
                         ListTile(
                           leading: FaIcon(FontAwesomeIcons.circleCheck,
-                              size: 25, color: Color.fromARGB(255, 104, 134, 220)),
+                              size: 25,
+                              color: Color.fromARGB(255, 104, 134, 220)),
                           title: Text(
                             'Completed',
                             style: TextStyle(
                                 color: Color.fromARGB(255, 65, 72, 101),
                                 fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text('None',
+                          subtitle: Text(
+                            'None',
                             style: TextStyle(
-                              color: Color.fromARGB(255, 166,169,166),
+                              color: Color.fromARGB(255, 166, 169, 166),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -197,7 +225,7 @@ class _homepageState extends State<homepage>{
                         Text(
                           "Enrolled Subjects",
                           style: TextStyle(
-                              color: Color.fromARGB(255, 16, 38 ,65),
+                              color: Color.fromARGB(255, 16, 38, 65),
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign.start,
@@ -205,8 +233,8 @@ class _homepageState extends State<homepage>{
                       ],
                     ),
                   ),
-
-                  Container( //table container
+                  Container(
+                    //table container
                     padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0),
                     child: Card(
                       color: Color.fromARGB(255, 249, 250, 254),
@@ -223,11 +251,11 @@ class _homepageState extends State<homepage>{
                           ),
                         ],
                         rows: [
-                          DataRow(cells:[
+                          DataRow(cells: [
                             DataCell(Text('1')),
                             DataCell(Text('SECR2491')),
                           ]),
-                          DataRow(cells:[
+                          DataRow(cells: [
                             DataCell(Text('2')),
                             DataCell(Text('SECR3941')),
                           ]),
@@ -235,16 +263,14 @@ class _homepageState extends State<homepage>{
                       ),
                     ),
                   ),
-
                   Container(
                     padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 10.0),
-                    child: Row (
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                            "UTM Study Planner App V1.0.0",
-                            style: TextStyle(color: Colors.grey, fontSize: 12.0)
-                        ),
+                        Text("UTM Study Planner App V1.0.0",
+                            style:
+                                TextStyle(color: Colors.grey, fontSize: 12.0)),
                       ],
                     ),
                   ),

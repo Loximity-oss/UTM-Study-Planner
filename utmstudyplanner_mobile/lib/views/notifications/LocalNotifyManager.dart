@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mysql_client/mysql_client.dart';
 import 'dart:io' show Platform;
 import 'package:rxdart/subjects.dart';
+import '/../../server/conn.dart';
+import 'dart:convert';
+import 'package:timezone/standalone.dart' as tz;
 
 class LocalNotifyManager {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -74,8 +78,7 @@ class LocalNotifyManager {
         payload: 'New Payload');
   }
 
-  Future scheduleNotification() async {
-    var scheduleNotificationDateTime = DateTime.now().add(Duration(seconds: 5));
+  Future scheduleNotification(IResultSet result) async {
     var androidChannel = AndroidNotificationDetails(
       'CHANNEL_ID',
       'CHANNEL_NAME',
@@ -89,9 +92,22 @@ class LocalNotifyManager {
     var platformChannel =
         NotificationDetails(android: androidChannel, iOS: iosChannel);
 
-    await flutterLocalNotificationsPlugin.schedule(0, 'Scheduled Test Title',
-        'Scheduled Test Body', scheduleNotificationDateTime, platformChannel,
-        payload: 'New Payload');
+    for (var row in result.rows) {
+      String scheduleNotificationDateTime =
+          row.colByName('fromEvent').toString();
+
+      DateTime dt = DateTime.parse(scheduleNotificationDateTime);
+
+      if (dt.compareTo(DateTime.now()) > 0) {
+        await flutterLocalNotificationsPlugin.schedule(
+            int.parse(row.colByName('eventID').toString()),
+            row.colByName('eventName'),
+            '',
+            dt,
+            platformChannel,
+            payload: 'New Payload');
+      }
+    }
   }
 }
 

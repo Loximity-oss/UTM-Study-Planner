@@ -3,27 +3,26 @@ import 'package:mysql_client/mysql_client.dart';
 class Mysql {
   Mysql();
 
-  Future<IResultSet> execQuery(String query) async{
+  Future<IResultSet> execQuery(String query) async {
     final conn = await MySQLConnection.createConnection(
-      host: "10.0.2.2",
-      port: 3306,
-      userName: "UTM",
-      password: ".JzO2Agvp*UFj@g[",
-      databaseName: 'utm_study_planner',
-      secure: false //XAMPP MariaDB version >10. issue in library.
-    );
+        host: "10.0.2.2",
+        port: 3306,
+        userName: "root",
+        password: "001125010267",
+        databaseName: 'utmstudyplanner',
+        secure: false //XAMPP MariaDB version >10. issue in library.
+        );
 
     // try connecting to DB.
     // if true, connection is successful.
     // if false, connection failed and pass to alertDialog.
 
-    try{
+    try {
       await conn.connect();
       var result = await conn.execute(query);
       conn.close();
       return result;
-
-    } catch(e){
+    } catch (e) {
       rethrow;
     }
   }
