@@ -4,7 +4,10 @@ import 'package:email_auth/email_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../server/conn.dart';
+import 'register.dart';
 import 'package:http/http.dart' as http;
+
+
 
 
 class verifyEmail extends StatefulWidget {
@@ -22,18 +25,24 @@ class verifyEmail extends StatefulWidget {
 class _verifyEmail extends State<verifyEmail> {
 
 
+
   @override
   final box = Hive.box('');
-  final TextEditingController emailInput = TextEditingController();
+  final TextEditingController emailVerify = TextEditingController();
   final TextEditingController userOTP = TextEditingController();
   final _formLoginKey = GlobalKey<FormState>();
   bool visible = false;
 
-  EmailAuth emailAuth =  new EmailAuth(sessionName: "Sample session");
 
-  void sendOtp() async {
+
+
+
+  EmailAuth emailAuth =  new EmailAuth(sessionName: "UTM Study Planner");
+
+
+  void sendOTP() async {
     var res = await emailAuth.sendOtp(
-        recipientMail: emailInput.text, otpLength: 5);
+        recipientMail: emailVerify.text, otpLength: 5);
     if(res){
       print("OTP Sent.");
     }
@@ -43,7 +52,7 @@ class _verifyEmail extends State<verifyEmail> {
   }
 
   void verifyOTP() {
-    var res = emailAuth.validateOtp(recipientMail: emailInput.text, userOtp: userOTP.text);
+    var res = emailAuth.validateOtp(recipientMail: emailVerify.text, userOtp: userOTP.text);
     if (res){
       print("OTP verified");
     }
@@ -81,7 +90,7 @@ class _verifyEmail extends State<verifyEmail> {
                       key: _formLoginKey,
                       child: Column(
                         children:  <Widget>[
-                          TextFormField(controller: emailInput,
+                          TextFormField(controller: userOTP,
                             style: const TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.only(left: 20, right: 20),
@@ -94,7 +103,7 @@ class _verifyEmail extends State<verifyEmail> {
                                 ),
                                 suffixIcon: TextButton(
                                   child: const Text("Send OTP"),
-                                  onPressed: () => sendOtp(),
+                                  onPressed: () => sendOTP(),
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(color: Colors.grey[800]),
