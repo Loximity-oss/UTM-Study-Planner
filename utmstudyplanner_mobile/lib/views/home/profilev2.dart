@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
@@ -48,7 +47,58 @@ class _profilePageState extends State<profilePageV2> {
     }
   }
 
-  Future changeProfile() async{
+  Future changeProfilePicture() async{
+    var db = Mysql();
+
+    String img64;
+
+    if(_image2 != null){
+      final bytes = _image2?.readAsBytesSync();
+      img64 = base64Encode(bytes!);
+    } else {
+      img64 = '';
+    }
+
+    String query = 'UPDATE `users` SET `profilePicture` = "'+ img64 +'" WHERE `users`.`id` = "'+ box.get("matricID") +'"';
+    try{
+      var result = await db.execQuery(query);
+      if (result.affectedRows.toInt() == 1) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Profile picture updated successfully.'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    loadProfilePic();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
 
   }
 
@@ -541,46 +591,49 @@ class _profilePageState extends State<profilePageV2> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('Change Profile'),
-                        content: Form(
-                          key: _formPasswordKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap: () async {
-                                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                                  setState(() {
-                                    if (pickedFile != null) {
-                                      _image2 = File(pickedFile.path);
-                                      log(_image2.toString());
-                                    } else {
-                                      print('No image selected.');
-                                    }
-                                  });
-                                },
-                                child: CircleAvatar(
-                                  radius: 60.0,
-                                  child: ClipOval(
-                                    child: SizedBox(
-                                      child: (_image2!=null)? Image.file(
-                                        _image2!,
-                                        fit: BoxFit.fill,
-                                      ):Image.asset(
-                                        "assets/Profile/default.png",
-                                        fit: BoxFit.fill,
+                        content: StatefulBuilder(
+                          builder: (BuildContext context, StateSetter setState) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget> [
+                                GestureDetector(
+                                  onTap: () async {
+                                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                    setState(() {
+                                      if (pickedFile != null) {
+                                        _image2 = File(pickedFile.path);
+                                      } else {
+                                        print('No image selected.');
+                                      }
+                                    });
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 60.0,
+                                    child: ClipOval(
+                                      child: SizedBox(
+                                        child: (_image2!=null)? Image.file(
+                                          _image2!,
+                                          fit: BoxFit.fill,
+                                        ):Image.memory(
+                                          base64Decode(_image!),
+                                          fit: BoxFit.fill,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            );
+                          },
                         ),
                         actions: <Widget>[
                           TextButton(
                             child: const Text("OK"),
-                            onPressed: () => _formPasswordKey.currentState!.validate() ? changePassword() : null,
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              changeProfilePicture();
+                            },
                           ),
                           TextButton(
                             child: const Text("Cancel"),
@@ -589,7 +642,6 @@ class _profilePageState extends State<profilePageV2> {
                             },
                           ),
                         ],
-
                       );
                     },
                   );
