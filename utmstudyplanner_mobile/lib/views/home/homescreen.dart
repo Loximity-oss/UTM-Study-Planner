@@ -1,3 +1,10 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'dart:developer';
+
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
@@ -13,12 +20,33 @@ class homepage extends StatefulWidget{
 }
 
 class _homepageState extends State<homepage>{
-  final GlobalKey<ScaffoldState> _homepageKey = GlobalKey<ScaffoldState>();
+
   final box = Hive.box('');
+  String? _image;
+
+  void loadProfilePic() async {
+    var db = Mysql();
+    try{
+      String query = 'SELECT profilePicture FROM `users` WHERE `email` = "'+ box.get('email') +'" AND password = "' + box.get('password') + '"';
+
+      var result = await db.execQuery(query);
+        for (final row in result.rows) {
+          final s = row.colAt(0);
+          setState(() {
+            _image = s;
+          });
+
+      }
+
+    } catch (e){
+      print(e.toString());
+    }
+  }
 
   @override
   void initState()  {
     super.initState();
+    loadProfilePic();
   }
 
   @override
@@ -68,12 +96,17 @@ class _homepageState extends State<homepage>{
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(image: AssetImage('assets/Profile/default.png')),
+                      CircleAvatar(
+                        radius: 50.0,
+                        child: ClipOval(
+                          child: SizedBox(
+                            child: (_image!=null) ? Image.memory(base64Decode(_image!),
+                              fit: BoxFit.fill,
+                            ):Image.asset(
+                              "assets/Profile/default.png",
+                              fit: BoxFit.fill,
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(height: 10),
