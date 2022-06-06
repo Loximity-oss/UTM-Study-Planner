@@ -60,7 +60,6 @@ class _newPassword extends State<newPassword> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();
-                    Navigator.of(context).pop();
                   },
                 ),
               ],
@@ -164,7 +163,7 @@ class _newPassword extends State<newPassword> {
                                 if (passwordCheck.trim().length < 8) {
                                   return 'Password must be at least 8 characters.';
                                 }
-                                if (passwordCheck == box.get('password')) {
+                                if (passwordCheck == box.get('tempPassword')) {
                                   return 'Password cannot be similar.';
                                 }
                                 if (!passwordCheck.contains(RegExp(r"[0-9]"))) {

@@ -37,13 +37,16 @@ class _forgotPassword extends State<forgotPassword> {
     final scaffold = ScaffoldMessenger.of(context);
     var db = Mysql();
     String query =
-        'SELECT `email` FROM `users` WHERE `email` = "' +
+        'SELECT `email`, `password` FROM `users` WHERE `email` = "' +
             emailVerify.text +
             '"';
-
+    print(query);
     try{
       var result = await db.execQuery(query);
       if (result.numOfRows == 1) {
+        for (final row in result.rows) {
+          box.put('tempPassword', row.colAt(1));
+        }
         startTimer();
         var res =
         await emailAuth.sendOtp(recipientMail: emailVerify.text, otpLength: 5);
@@ -68,6 +71,9 @@ class _forgotPassword extends State<forgotPassword> {
         throw Exception('Invalid Email');
       }
     } catch (e){
+      setState(() {
+        visible = true;
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {

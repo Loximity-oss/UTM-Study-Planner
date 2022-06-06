@@ -41,7 +41,7 @@ class _registerPageState extends State<registerPage> {
 
     //Prepare Query
     String query = 'INSERT INTO `users` (`id`, `email`, `name`, `coursecode`, `password`, `password_2`, `password_3`, `profilePicture`, `verificationStatus`) VALUES ("'
-        + inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse + '","' + inputPassword + '", NULL, NULL, ';
+        + inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse + '","' + inputPassword + '", "-", "-", ';
 
     //Then append to query str.
     if(_image != null){
