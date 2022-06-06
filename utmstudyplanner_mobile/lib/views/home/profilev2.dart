@@ -1,10 +1,14 @@
-import 'package:email_validator/email_validator.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/server/conn.dart';
 
+import 'homescreen.dart';
 
 class profilePageV2 extends StatefulWidget {
   const profilePageV2({Key? key}) : super(key: key);
@@ -19,13 +23,104 @@ class _profilePageState extends State<profilePageV2> {
   final TextEditingController passwordInput = TextEditingController();
   final _formNicknameKey = GlobalKey<FormState>();
   final _formPasswordKey = GlobalKey<FormState>();
+  final picker = ImagePicker();
+
+  String? _image;
+  File? _image2;
 
   bool visible = false;
 
+  Future<bool> _onWillPop() async {
+    Navigator.of(context).pop(false);
+    Navigator.of(context).pop(false);
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const homepage()));
+    return false;
+  }
+
+  void loadProfilePic() async {
+    var db = Mysql();
+    try{
+      String query = 'SELECT profilePicture FROM `users` WHERE `email` = "'+ box.get('email') +'" AND password = "' + box.get('password') + '"';
+
+      var result = await db.execQuery(query);
+      for (final row in result.rows) {
+        final s = row.colAt(0);
+        setState(() {
+          _image = s;
+        });
+
+      }
+
+    } catch (e){
+      print(e.toString());
+    }
+  }
+
+  Future changeProfilePicture() async{
+    var db = Mysql();
+
+    String img64;
+
+    if(_image2 != null){
+      final bytes = _image2?.readAsBytesSync();
+      img64 = base64Encode(bytes!);
+    } else {
+      img64 = '';
+    }
+
+    String query = 'UPDATE `users` SET `profilePicture` = "'+ img64 +'" WHERE `users`.`id` = "'+ box.get("matricID") +'"';
+    try{
+      var result = await db.execQuery(query);
+      if (result.affectedRows.toInt() == 1) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Profile picture updated successfully.'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    loadProfilePic();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+  }
 
   Future changePassword() async{
     var db = Mysql();
-    String query = 'UPDATE `users` SET `password` = "'+ passwordInput.text +'" WHERE `users`.`id` = "'+ box.get("matricID") +'"';
+    String query = 'UPDATE users as T1' +
+    ' INNER JOIN (SELECT `password`, `password_2`, `password_3` FROM users WHERE id = "'+ box.get("matricID") +'" ''AND `password_2` NOT LIKE "%'+ passwordInput.text +'%" AND `password_3` NOT LIKE "%'+ passwordInput.text +'%") as T2' +
+    ' SET T1.password = "'+ passwordInput.text +'",'+
+    ' T1.password_2 = T2.password,' +
+    ' T1.password_3 = T2.password_2' +
+    ' WHERE T1.id = "'+ box.get("matricID") +'"';
+
     try{
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {
@@ -49,7 +144,28 @@ class _profilePageState extends State<profilePageV2> {
             );
           },
         );
+      } else {
+        passwordInput.clear();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('You cannot use a previous password'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {});
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
+
+
     }catch(e){
       showDialog(
         context: context,
@@ -118,8 +234,15 @@ class _profilePageState extends State<profilePageV2> {
   }
 
   @override
+  void initState()  {
+    super.initState();
+    loadProfilePic();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(onWillPop: _onWillPop,
+    child: Scaffold(
       appBar: AppBar(
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color.fromARGB(255, 93, 6, 29),
@@ -145,9 +268,18 @@ class _profilePageState extends State<profilePageV2> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const CircleAvatar(
-                      backgroundImage: AssetImage('assets/Profile/default.png'),
+                    CircleAvatar(
                       radius: 50.0,
+                      child: ClipOval(
+                        child: SizedBox(
+                          child: (_image!=null) ? Image.memory(base64Decode(_image!),
+                            fit: BoxFit.fill,
+                          ):Image.asset(
+                            "assets/Profile/default.png",
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(
                       height: 10.0,
@@ -431,7 +563,6 @@ class _profilePageState extends State<profilePageV2> {
                             },
                           ),
                         ],
-
                       );
                     },
                   );
@@ -458,9 +589,102 @@ class _profilePageState extends State<profilePageV2> {
                 ),
               )
           ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          Container(
+              width: 300.0,
+              child: RaisedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Change Profile'),
+                        content: StatefulBuilder(
+                          builder: (BuildContext context, StateSetter setState) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget> [
+                                GestureDetector(
+                                  onTap: () async {
+                                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                    setState(() {
+                                      if (pickedFile != null) {
+                                        _image2 = File(pickedFile.path);
+                                      } else {
+                                        print('No image selected.');
+                                      }
+                                    });
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 60.0,
+                                    child: ClipOval(
+                                      child: SizedBox(
+                                        child: (_image2!=null)? Image.file(
+                                          _image2!,
+                                          fit: BoxFit.fill,
+                                        ):Image.memory(
+                                          base64Decode(_image!),
+                                          fit: BoxFit.fill,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text("OK"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              changeProfilePicture();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text("Cancel"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(80.0)
+                ),
+                elevation: 0.0,
+                padding: const EdgeInsets.all(0.0),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                      colors: [Colors.redAccent, Colors.pinkAccent],
+                    ),
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                    alignment: Alignment.center,
+                    child: const Text("Change Profile Image", style: TextStyle(color: Colors.white, fontSize: 26.0, fontWeight: FontWeight.w300)),
+                  ),
+                ),
+              )
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
         ],
       ),
       ),
+    ),
     );
   }
 }

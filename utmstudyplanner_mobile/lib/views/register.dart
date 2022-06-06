@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:utmstudyplanner_mobile/views/login/login.dart';
 import 'package:utmstudyplanner_mobile/views/verifyEmail.dart';
 import '../../server/conn.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:utmstudyplanner_mobile/views/register.dart';
-import 'package:http/http.dart' as http;
+
 
 class registerPage extends StatefulWidget {
   const registerPage({Key? key}) : super(key: key);
@@ -25,50 +26,48 @@ class _registerPageState extends State<registerPage> {
   final TextEditingController passwordInput = TextEditingController();
   final TextEditingController confirm_password = TextEditingController();
   final _formRegisterKey = GlobalKey<FormState>();
-  bool visible = false;
+  final picker = ImagePicker();
+  File? _image;
+
 
   Future userRegister() async {
     // Getting value from Controller
-
     String inputID = IDInput.text;
     String inputEmail = emailInput.text;
     String inputName = nameInput.text;
     String inputCourse = courseInput.text;
     String inputPassword = passwordInput.text;
+    String img64;
 
+    //Prepare Query
+    String query = 'INSERT INTO `users` (`id`, `email`, `name`, `coursecode`, `password`, `password_2`, `password_3`, `profilePicture`, `verificationStatus`) VALUES ("'
+        + inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse + '","' + inputPassword + '", NULL, NULL, ';
+
+    //Then append to query str.
+    if(_image != null){
+      final bytes = _image?.readAsBytesSync();
+      img64 = base64Encode(bytes!);
+      query = query +  '"' + img64 + '", 0)';
+    } else {
+      query = query + 'NULL, 0)';
+    }
+
+    print(query);
     //TODO implement conn checking
     var db = Mysql();
-    String query = 'INSERT INTO `users`(`id`, `email`, `name`, `coursecode`, `password`) VALUES ("' +
-        inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse +
-        '","' + inputPassword + '")';
-    print(query);
+
     try{
       var result = await db.execQuery(query);
-      IDInput.clear();
-      emailInput.clear();
-      nameInput.clear();
-      courseInput.clear();
-      passwordInput.clear();
-      confirm_password.clear();
       if (result.affectedRows.toInt() == 1) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Data has been successfully inserted into the database.'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {}
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => verifyEmail(email: inputEmail, password: inputPassword)));
+        IDInput.clear();
+        emailInput.clear();
+        nameInput.clear();
+        courseInput.clear();
+        passwordInput.clear();
+        confirm_password.clear();
+      }
     }catch(e){
       showDialog(
         context: context,
@@ -90,6 +89,8 @@ class _registerPageState extends State<registerPage> {
 
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,23 +110,48 @@ class _registerPageState extends State<registerPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                width: 120,
-                height: 120,
-                decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-              ),
-              const SizedBox(height: 5),
-              Container(
                 padding: const EdgeInsets.only(left: 50, right: 50),
                 child: Column(
                   children: [
-                    const SizedBox(height: 5),
-                    const Text('Registration', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    const Text('Fill in the required information', style: TextStyle(fontSize: 15)),
-                    const SizedBox(height: 20),
                     Form(
                       key: _formRegisterKey,
                       child: Column(
                         children:  <Widget>[
+                          GestureDetector(
+                            onTap: () async {
+                              final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                              setState(() {
+
+                                if (pickedFile != null) {
+                                  _image = File(pickedFile.path);
+
+                                } else {
+                                  print('No image selected.');
+                                }
+                              });
+                            },
+                            child:  CircleAvatar(
+                              radius: 60.0,
+                              child: ClipOval(
+                                child: SizedBox(
+                                  child: (_image!=null)? Image.file(
+                                    _image!,
+                                    fit: BoxFit.fill,
+                                  ):Image.asset(
+                                    "assets/Profile/default.png",
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+
+                          const SizedBox(height: 5),
+                          const Text('Registration', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('Fill in the required information', style: TextStyle(fontSize: 15)),
+                          const SizedBox(height: 20),
+
                           TextFormField(
                             controller: emailInput,
                             style: const TextStyle(fontSize: 14),
@@ -316,19 +342,7 @@ class _registerPageState extends State<registerPage> {
                             child:
                             const Text("Have an account? Click me!", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => const loginPage()),
-                              );
-                            },
-                          ),
-
-                          TextButton(
-                            child:
-                            const Text("Test for Verify", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                            onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => verifyEmail()),
-                              );
+                              Navigator.of(context).pop();
                             },
                           ),
 
@@ -352,13 +366,6 @@ class _registerPageState extends State<registerPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Visibility(
-                        visible: visible,
-                        child: Container(
-                            margin: const EdgeInsets.only(bottom: 30),
-                            child: const CircularProgressIndicator(color: Color.fromARGB(255, 93, 6, 29))
-                        )
-                    ),
                   ],
                 ),
               ),
