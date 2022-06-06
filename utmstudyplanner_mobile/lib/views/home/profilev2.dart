@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/server/conn.dart';
 
+import 'homescreen.dart';
+
 class profilePageV2 extends StatefulWidget {
   const profilePageV2({Key? key}) : super(key: key);
 
@@ -27,6 +29,14 @@ class _profilePageState extends State<profilePageV2> {
   File? _image2;
 
   bool visible = false;
+
+  Future<bool> _onWillPop() async {
+    Navigator.of(context).pop(false);
+    Navigator.of(context).pop(false);
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const homepage()));
+    return false;
+  }
 
   void loadProfilePic() async {
     var db = Mysql();
@@ -231,7 +241,8 @@ class _profilePageState extends State<profilePageV2> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(onWillPop: _onWillPop,
+    child: Scaffold(
       appBar: AppBar(
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color.fromARGB(255, 93, 6, 29),
@@ -552,7 +563,6 @@ class _profilePageState extends State<profilePageV2> {
                             },
                           ),
                         ],
-
                       );
                     },
                   );
@@ -674,6 +684,7 @@ class _profilePageState extends State<profilePageV2> {
         ],
       ),
       ),
+    ),
     );
   }
 }

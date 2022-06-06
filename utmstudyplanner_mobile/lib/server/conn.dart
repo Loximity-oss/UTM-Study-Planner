@@ -7,9 +7,9 @@ class Mysql {
     final conn = await MySQLConnection.createConnection(
         host: "10.0.2.2",
         port: 3306,
-        userName: "root",
-        password: "001125010267",
-        databaseName: 'utmstudyplanner',
+        userName: "UTM",
+        password: "RPTqW41r8loMOa1a",
+        databaseName: 'utm_study_planner',
         secure: false //XAMPP MariaDB version >10. issue in library.
         );
 

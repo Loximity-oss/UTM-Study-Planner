@@ -39,45 +39,35 @@ class _registerPageState extends State<registerPage> {
     String inputPassword = passwordInput.text;
     String img64;
 
+    //Prepare Query
+    String query = 'INSERT INTO `users` (`id`, `email`, `name`, `coursecode`, `password`, `password_2`, `password_3`, `profilePicture`, `verificationStatus`) VALUES ("'
+        + inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse + '","' + inputPassword + '", NULL, NULL, ';
+
+    //Then append to query str.
     if(_image != null){
       final bytes = _image?.readAsBytesSync();
       img64 = base64Encode(bytes!);
+      query = query +  '"' + img64 + '", 0)';
     } else {
-      img64 = '';
+      query = query + 'NULL, 0)';
     }
 
+    print(query);
     //TODO implement conn checking
     var db = Mysql();
-    String query = 'INSERT INTO `users` (`id`, `email`, `name`, `coursecode`, `password`, `password_2`, `password_3`, `profilePicture`) VALUES ("'
-        + inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse + '","' + inputPassword + '", NULL, NULL, "' + img64 + '")';
 
     try{
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Data has been successfully inserted into the database.'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                    IDInput.clear();
-                    emailInput.clear();
-                    nameInput.clear();
-                    courseInput.clear();
-                    passwordInput.clear();
-                    confirm_password.clear();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {}
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => verifyEmail(email: inputEmail, password: inputPassword)));
+        IDInput.clear();
+        emailInput.clear();
+        nameInput.clear();
+        courseInput.clear();
+        passwordInput.clear();
+        confirm_password.clear();
+      }
     }catch(e){
       showDialog(
         context: context,
@@ -352,19 +342,7 @@ class _registerPageState extends State<registerPage> {
                             child:
                             const Text("Have an account? Click me!", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => const loginPage()),
-                              );
-                            },
-                          ),
-
-                          TextButton(
-                            child:
-                            const Text("Test for Verify", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                            onPressed: () {
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => verifyEmail()),
-                              );
+                              Navigator.of(context).pop();
                             },
                           ),
 
