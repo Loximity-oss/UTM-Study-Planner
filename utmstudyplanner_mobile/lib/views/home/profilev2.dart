@@ -120,7 +120,7 @@ class _profilePageState extends State<profilePageV2> {
     ' T1.password_2 = T2.password,' +
     ' T1.password_3 = T2.password_2' +
     ' WHERE T1.id = "'+ box.get("matricID") +'"';
-
+    print(query);
     try{
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {
@@ -146,23 +146,7 @@ class _profilePageState extends State<profilePageV2> {
         );
       } else {
         passwordInput.clear();
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('You cannot use a previous password'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    setState(() {});
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        throw Exception('You cannot use a similar password.');
       }
 
 

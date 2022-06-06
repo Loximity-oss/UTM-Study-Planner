@@ -19,14 +19,13 @@ class verifyEmail extends StatefulWidget {
 }
 
 class _verifyEmail extends State<verifyEmail> {
-
   @override
   final box = Hive.box('');
   final TextEditingController userOTP = TextEditingController();
   final TextEditingController emailInput = TextEditingController();
   final _formOTPKey = GlobalKey<FormState>();
   final _formRetypeEmailKey = GlobalKey<FormState>();
-
+  late String email;
 
   bool visible = true;
 
@@ -35,6 +34,12 @@ class _verifyEmail extends State<verifyEmail> {
   int _start = 30;
   String otpText = 'Send OTP';
   EmailAuth emailAuth = EmailAuth(sessionName: "UTM Study Planner");
+
+  @override
+  void initState() {
+    email = widget.email;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -47,8 +52,7 @@ class _verifyEmail extends State<verifyEmail> {
       visible = false;
     });
     final scaffold = ScaffoldMessenger.of(context);
-    var res = await emailAuth.sendOtp(
-        recipientMail: widget.email, otpLength: 5);
+    var res = await emailAuth.sendOtp(recipientMail: email, otpLength: 5);
     if (res) {
       startTimer();
       scaffold.showSnackBar(
@@ -58,8 +62,7 @@ class _verifyEmail extends State<verifyEmail> {
               label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
         ),
       );
-    }
-    else {
+    } else {
       setState(() {
         visible = true;
       });
@@ -76,12 +79,16 @@ class _verifyEmail extends State<verifyEmail> {
 
   Future<void> verifyOTP() async {
     final scaffold = ScaffoldMessenger.of(context);
-    var res = emailAuth.validateOtp(
-        recipientMail: widget.email, userOtp: userOTP.text);
+    var res =
+        emailAuth.validateOtp(recipientMail: email, userOtp: userOTP.text);
     if (res) {
       var db = Mysql();
-      String query = 'UPDATE `users` SET `verificationStatus` = "1" WHERE `email` = "' +
-          widget.email + '" AND `password` = "' + widget.password + '"';
+      String query =
+          'UPDATE `users` SET `verificationStatus` = "1" WHERE `email` = "' +
+              email +
+              '" AND `password` = "' +
+              widget.password +
+              '"';
       try {
         var result = await db.execQuery(query);
         if (result.affectedRows.toInt() == 1) {
@@ -125,8 +132,7 @@ class _verifyEmail extends State<verifyEmail> {
           },
         );
       }
-    }
-    else {
+    } else {
       scaffold.showSnackBar(
         SnackBar(
           content: const Text('Invalid OTP.'),
@@ -137,14 +143,19 @@ class _verifyEmail extends State<verifyEmail> {
     }
   }
 
-  Future retypeEmail() async{
+  Future retypeEmail() async {
     var db = Mysql();
-    String query = 'UPDATE `users` SET `email` = "' + emailInput.text + '"  WHERE `email` = "' +
-        widget.email + '" AND `password` = "' + widget.password + '"';
-    try{
+    String query = 'UPDATE `users` SET `email` = "' +
+        emailInput.text +
+        '"  WHERE `email` = "' +
+        email +
+        '" AND `password` = "' +
+        widget.password +
+        '"';
+    try {
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {
-        widget.email = emailInput.text;
+        email = emailInput.text;
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -165,7 +176,7 @@ class _verifyEmail extends State<verifyEmail> {
       } else {
         throw Exception('Duplicate Email');
       }
-    } catch(e) {
+    } catch (e) {
       return AlertDialog(
         title: Text(e.toString()),
         actions: <Widget>[
@@ -181,12 +192,11 @@ class _verifyEmail extends State<verifyEmail> {
     }
   }
 
-
   void startTimer() {
     const oneSec = Duration(seconds: 1);
     _timer = Timer.periodic(
       oneSec,
-          (Timer timer) {
+      (Timer timer) {
         if (_start == 0) {
           setState(() {
             _start = 30;
@@ -205,20 +215,18 @@ class _verifyEmail extends State<verifyEmail> {
     );
   }
 
-
-
   Widget build(BuildContext context) {
-    return WillPopScope(onWillPop: () async => false,
+    return WillPopScope(
+      onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 255, 249, 235),
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text(
-              'Email Verification', style: TextStyle(color: Colors.black)),
+          title: const Text('Email Verification',
+              style: TextStyle(color: Colors.black)),
           backgroundColor: Colors.transparent,
           iconTheme: (const IconThemeData(color: Colors.black)),
           elevation: 0,
-
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.only(top: 120, bottom: 100),
@@ -236,14 +244,16 @@ class _verifyEmail extends State<verifyEmail> {
                   child: Column(
                     children: [
                       const SizedBox(height: 5),
-                      const Text('Verify Email', style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
+                      const Text('Verify Email',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 20),
                       Form(
                         key: _formOTPKey,
                         child: Column(
                           children: <Widget>[
-                            TextFormField(controller: userOTP,
+                            TextFormField(
+                              controller: userOTP,
                               style: const TextStyle(fontSize: 14),
                               decoration: InputDecoration(
                                   contentPadding: const EdgeInsets.only(
@@ -264,15 +274,12 @@ class _verifyEmail extends State<verifyEmail> {
                                   hintText: "OTP",
                                   fillColor: Colors.white),
                             ),
-
                             const SizedBox(height: 20),
                           ],
                         ),
                       ),
-
                       TextButton(
-                        child:
-                        const Text("Wrong Email Address?",
+                        child: const Text("Wrong Email Address?",
                             style: TextStyle(
                                 fontSize: 11, fontWeight: FontWeight.bold)),
                         onPressed: () {
@@ -280,47 +287,57 @@ class _verifyEmail extends State<verifyEmail> {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: const Text('Change Password'),
+                                title: const Text('Change Email'),
                                 content: Form(
                                   key: _formRetypeEmailKey,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       TextFormField(
                                         enableSuggestions: false,
                                         autocorrect: false,
-                                        obscureText: true,
                                         controller: emailInput,
                                         textInputAction: TextInputAction.next,
-                                        decoration: const InputDecoration(hintText: 'New Password'),
-                                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                                        validator: (value) => EmailValidator.validate(value!) ? null : "Please enter a valid email.",
+                                        decoration: const InputDecoration(
+                                            hintText: 'New Email'),
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        validator: (value) =>
+                                            EmailValidator.validate(value!)
+                                                ? null
+                                                : "Please enter a valid email.",
                                       ),
                                       TextFormField(
                                           enableSuggestions: false,
                                           autocorrect: false,
-                                          obscureText: true,
-                                          textInputAction: TextInputAction.next,
-                                          decoration: const InputDecoration(hintText: 'Confirm New Password'),
-                                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                                          decoration: const InputDecoration(
+                                              hintText: 'Confirm New Email'),
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
                                           validator: (emailCheck) {
-                                            if (emailCheck == null || emailCheck.isEmpty) {
+                                            if (emailCheck == null ||
+                                                emailCheck.isEmpty) {
                                               return 'Please enter an email address.';
-                                            } else if (emailCheck != emailInput.text){
+                                            } else if (emailCheck !=
+                                                emailInput.text) {
                                               return 'Email Addresses do not match.';
                                             } else {
                                               return null;
                                             }
-                                          }
-                                      ),
+                                          }),
                                     ],
                                   ),
                                 ),
                                 actions: <Widget>[
                                   TextButton(
                                     child: const Text("OK"),
-                                    onPressed: () => _formRetypeEmailKey.currentState!.validate() ? retypeEmail() : null,
+                                    onPressed: () => _formRetypeEmailKey
+                                            .currentState!
+                                            .validate()
+                                        ? retypeEmail()
+                                        : null,
                                   ),
                                   TextButton(
                                     child: const Text("Cancel"),
@@ -334,13 +351,8 @@ class _verifyEmail extends State<verifyEmail> {
                           );
                         },
                       ),
-
-
                       Container(
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width / 2.0,
+                        width: MediaQuery.of(context).size.width / 2.0,
                         height: 40,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(35.0),
@@ -348,11 +360,13 @@ class _verifyEmail extends State<verifyEmail> {
                         ),
                         child: MaterialButton(
                           onPressed: () => verifyOTP(),
-                          child: const Text('Verify OTP',
+                          child: const Text(
+                            'Verify OTP',
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
-                            ),),
+                            ),
+                          ),
                         ),
                       ),
                     ],

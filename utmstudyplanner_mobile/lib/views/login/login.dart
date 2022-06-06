@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:utmstudyplanner_mobile/views/login/passwordForget/forgotPassword.dart';
 import 'package:utmstudyplanner_mobile/views/register.dart';
 
 import '../../server/conn.dart';
@@ -196,6 +197,21 @@ class _loginPageState extends State<loginPage> {
                                 hintText: "Password",
                                 fillColor: Colors.white),
                           ),
+
+                          TextButton(
+                            child: const Text(
+                                "Forget Password",
+                                style: TextStyle(
+                                    fontSize: 11, fontWeight: FontWeight.bold)),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => forgotPassword()),
+                              );
+                            },
+                          ),
+
                           TextButton(
                             child: const Text(
                                 "Don't have an account? Click me!",
