@@ -4,6 +4,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:utmstudyplanner_mobile/server/auth.config.dart';
 
 import '../server/conn.dart';
 
@@ -35,8 +36,10 @@ class _verifyEmail extends State<verifyEmail> {
   String otpText = 'Send OTP';
   EmailAuth emailAuth = EmailAuth(sessionName: "UTM Study Planner");
 
+
   @override
   void initState() {
+    emailAuth.config(remoteServerConfiguration);
     email = widget.email;
     super.initState();
   }

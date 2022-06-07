@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:utmstudyplanner_mobile/views/login/passwordForget/newPassword.dart';
 
+import '../../../server/auth.config.dart';
 import '../../../server/conn.dart';
 
 class forgotPassword extends StatefulWidget {
@@ -29,6 +30,12 @@ class _forgotPassword extends State<forgotPassword> {
   String otpText = 'Send OTP';
 
   EmailAuth emailAuth = EmailAuth(sessionName: "UTM Study Planner");
+
+  @override
+  void initState() {
+    emailAuth.config(remoteServerConfiguration);
+    super.initState();
+  }
 
   void sendOTP() async {
     setState(() {
