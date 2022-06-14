@@ -41,6 +41,9 @@ dependencies:
   syncfusion_flutter_calendar: ^20.1.52
   mysql_client: ^0.0.16
   intl: ^0.17.0
+  date_time_picker: ^2.1.0
+  image_picker: ^0.8.5+3
+  email_auth: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +75,7 @@ flutter:
     - assets/signup/
     - assets/Profile/
     - assets/images/
+    - assets/verify_email/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

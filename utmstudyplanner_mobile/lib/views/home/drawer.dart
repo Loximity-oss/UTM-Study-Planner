@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
-import 'package:utmstudyplanner_mobile/views/home/profile.dart';
 import 'package:utmstudyplanner_mobile/views/home/profilev2.dart';
 import '../login/login.dart';
-import '../notifications/TestNotifyScreen.dart';
 import 'calendar/calendarv2.dart';
 
 class DefAppBar extends StatelessWidget {
@@ -13,7 +11,7 @@ class DefAppBar extends StatelessWidget {
   final box = Hive.box('');
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -22,7 +20,8 @@ class DefAppBar extends StatelessWidget {
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 93, 6, 29),
             ),
-            child: Text('UTM Study Planner', style: TextStyle(color: Colors.white)),
+            child: Text('UTM Study Planner',
+                style: TextStyle(color: Colors.white)),
           ),
           ListTile(
             leading: const FaIcon(FontAwesomeIcons.house, color: Colors.black),
@@ -30,8 +29,7 @@ class DefAppBar extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const homepage()
-                  ));
+                  MaterialPageRoute(builder: (context) => const homepage()));
             },
           ),
           ListTile(
@@ -39,29 +37,20 @@ class DefAppBar extends StatelessWidget {
             title: const Text('Profile'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const profilePageV2()
-                  ));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const profilePageV2()));
             },
           ),
           ListTile(
-            leading: const FaIcon(FontAwesomeIcons.calendar, color: Colors.black),
+            leading:
+                const FaIcon(FontAwesomeIcons.calendar, color: Colors.black),
             title: const Text('Calendar'),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const CalendarApp()
-                  ));
-            },
-          ),
-          ListTile(
-            leading: const FaIcon(FontAwesomeIcons.bell, color: Colors.black),
-            title: const Text('Notifications Settings'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const TestNotifyScreen()
-                  ));
+                  MaterialPageRoute(builder: (context) => const CalendarApp()));
             },
           ),
           ListTile(
@@ -79,35 +68,42 @@ class DefAppBar extends StatelessWidget {
                   children: [
                     Divider(),
                     ListTile(
-                        leading: const FaIcon(FontAwesomeIcons.arrowUpRightFromSquare, color: Colors.black),
+                        leading: const FaIcon(
+                            FontAwesomeIcons.arrowUpRightFromSquare,
+                            color: Colors.black),
                         title: const Text('Logout'),
-                        onTap: () => showDialog(context: context, builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Logout'),
-                          content: const Text('Would you like to log out?'),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                box.put('email', '');
-                                box.put('password', '');
-                                box.put('nickname', '');
-                                box.put('matricID','');
-                                box.put('coursecode','');
-                                Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => const loginPage()),
-                                );
-                              },
-                              child: const Text('Yes'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, 'No'),
-                              child: const Text('No'),
-                            ),
-                          ],
-                        ))
-                    ),
+                        onTap: () => showDialog(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                                  title: const Text('Logout'),
+                                  content:
+                                      const Text('Would you like to log out?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        box.put('email', '');
+                                        box.put('password', '');
+                                        box.put('nickname', '');
+                                        box.put('matricID', '');
+                                        box.put('coursecode', '');
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const loginPage()),
+                                        );
+                                      },
+                                      child: const Text('Yes'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, 'No'),
+                                      child: const Text('No'),
+                                    ),
+                                  ],
+                                ))),
                   ],
-                )
-            ),
+                )),
           ),
         ],
       ),
