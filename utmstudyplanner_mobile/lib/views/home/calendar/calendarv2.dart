@@ -30,6 +30,11 @@ class _CalendarPageState extends State<CalendarApp> {
   late TextEditingController dateBeforeInput;
   late TextEditingController dateAfterInput;
 
+  final reminderNumber = TextEditingController();
+
+  List<String> listItems = ["days", "weeks", "hours"];
+  String dropdownValue = "days";
+
   final _formAddEventKey = GlobalKey<FormState>();
   final _formEditEventKey = GlobalKey<FormState>();
 
@@ -45,16 +50,20 @@ class _CalendarPageState extends State<CalendarApp> {
             '`toEvent` = "' +
         dateAfterInput.text +
         '", '
-            '`background` = "0xFF0F8644" '
+            '`background` = "0xFF0F8644", '
+            '`reminder_number` = "' +
+        reminderNumber.text +
+        '", '
+            '`reminder_date` = "' +
+        dropdownValue +
+        '" '
             'WHERE `event`.`eventID` = "' +
         id.toString() +
         '"';
     try {
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {
-        titleInput.clear();
-        dateBeforeInput.clear();
-        dateAfterInput.clear();
+        clearData();
 
         Navigator.of(context).pop();
         showDialog(
@@ -98,12 +107,9 @@ class _CalendarPageState extends State<CalendarApp> {
   }
 
   Future<void> addData() async {
-    print(dateBeforeInput.text);
-    print(dateAfterInput.text);
-
     var db = Mysql();
     String query =
-        'INSERT INTO `event` (`eventID`, `eventName`, `fromEvent`, `toEvent`, `background`, `isAllDay`, `matricID`) VALUES (NULL, '
+        'INSERT INTO `event` (`eventID`, `eventName`, `fromEvent`, `toEvent`, `background`, `isAllDay`, `reminder_number`, `reminder_date`, `matricID`) VALUES (NULL, '
                 '"' +
             titleInput.text +
             '", '
@@ -115,6 +121,12 @@ class _CalendarPageState extends State<CalendarApp> {
             '", '
                 '"0xFF0F8644", 0, '
                 '"' +
+            reminderNumber.text +
+            '", '
+                '"' +
+            dropdownValue +
+            '", '
+                '"' +
             box.get('matricID') +
             '")';
 
@@ -122,9 +134,7 @@ class _CalendarPageState extends State<CalendarApp> {
     try {
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {
-        titleInput.clear();
-        dateBeforeInput.clear();
-        dateAfterInput.clear();
+        clearData();
 
         Navigator.of(context).pop();
         showDialog(
@@ -235,7 +245,9 @@ class _CalendarPageState extends State<CalendarApp> {
             DateTime.parse(row.colByName("toEvent")!),
             Color(int.parse(row.colByName("background")!)),
             false,
-            int.parse(row.colByName("eventID")!)));
+            int.parse(row.colByName("eventID")!),
+            int.parse(row.colByName("reminder_number")!),
+            row.colByName("reminder_date")!));
       }
       setState(() {
         events = MeetingDataSource(meetings);
@@ -245,12 +257,23 @@ class _CalendarPageState extends State<CalendarApp> {
     }
   }
 
+  void clearData() {
+    titleInput.clear();
+    dateBeforeInput.clear();
+    dateAfterInput.clear();
+    reminderNumber.clear();
+    dropdownValue = "days";
+  }
+
   void editDataModal(Meeting appointmentDetails) async {
     titleInput.text = appointmentDetails.eventName;
     dateBeforeInput.text =
         DateFormat('yyyy-MM-dd HH:mm:ss').format(appointmentDetails.from);
     dateAfterInput.text =
         DateFormat('yyyy-MM-dd HH:mm:ss').format(appointmentDetails.to);
+
+    reminderNumber.text = appointmentDetails.reminderNumber.toString();
+    dropdownValue = appointmentDetails.dateType;
 
     showDialog(
       context: context,
@@ -307,6 +330,69 @@ class _CalendarPageState extends State<CalendarApp> {
                       return null;
                     },
                   ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 4,
+                        child: TextFormField(
+                            controller: reminderNumber,
+                            keyboardType: TextInputType.number,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            decoration: InputDecoration(
+                              icon: Icon(Icons.notification_add),
+                              labelText: "Reminder Time",
+                            ),
+                            validator: (reminderNumber) {
+                              if (reminderNumber != '') {
+                                int intReminderNumber =
+                                    int.parse(reminderNumber.toString());
+                                if (dropdownValue == 'days') {
+                                  if (intReminderNumber < 1 ||
+                                      intReminderNumber > 28) {
+                                    return 'Between 1 and 28 days';
+                                  } else {
+                                    return null;
+                                  }
+                                } else if (dropdownValue == 'weeks') {
+                                  if (intReminderNumber < 1 ||
+                                      intReminderNumber > 4) {
+                                    return 'Between 1 to 4 weeks';
+                                  } else {
+                                    return null;
+                                  }
+                                } else if (dropdownValue == 'hours') {
+                                  if (intReminderNumber < 1 ||
+                                      intReminderNumber > 24) {
+                                    return 'Between 1 to 23 hours';
+                                  } else {
+                                    return null;
+                                  }
+                                }
+                              } else {
+                                return 'Please enter the field';
+                              }
+                            }),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: DropdownButtonFormField(
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            value: dropdownValue,
+                            onChanged: ((value) {
+                              setState(() {
+                                dropdownValue = value.toString();
+                              });
+                            }),
+                            items: listItems.map((item) {
+                              return DropdownMenuItem(
+                                  value: item, child: Text(item));
+                            }).toList()),
+                      )
+                    ],
+                  )
                 ],
               ),
             ),
@@ -322,6 +408,7 @@ class _CalendarPageState extends State<CalendarApp> {
               child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
+                clearData();
               },
             ),
           ],
@@ -340,7 +427,7 @@ class _CalendarPageState extends State<CalendarApp> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(appointmentDetails.eventName),
+              title: Text("Title: " + appointmentDetails.eventName),
               content: SizedBox(
                 height: 80,
                 child: Column(
@@ -348,7 +435,7 @@ class _CalendarPageState extends State<CalendarApp> {
                     Row(
                       children: <Widget>[
                         Text(
-                          appointmentDetails.from.toString(),
+                          "Event from: " + appointmentDetails.from.toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                           ),
@@ -358,7 +445,20 @@ class _CalendarPageState extends State<CalendarApp> {
                     Row(
                       children: <Widget>[
                         Text(
-                          appointmentDetails.to.toString(),
+                          "Event to: " + appointmentDetails.to.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          "Reminder Time: " +
+                              appointmentDetails.reminderNumber.toString() +
+                              " " +
+                              appointmentDetails.dateType,
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                           ),
@@ -426,6 +526,7 @@ class _CalendarPageState extends State<CalendarApp> {
                 return AlertDialog(
                   title: const Text('Add Event'),
                   content: Container(
+                    width: 300,
                     child: Form(
                       key: _formAddEventKey,
                       child: Column(
@@ -479,6 +580,69 @@ class _CalendarPageState extends State<CalendarApp> {
                               return null;
                             },
                           ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 4,
+                                child: TextFormField(
+                                    controller: reminderNumber,
+                                    keyboardType: TextInputType.number,
+                                    enableSuggestions: false,
+                                    autocorrect: false,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    decoration: InputDecoration(
+                                      icon: Icon(Icons.notification_add),
+                                      labelText: "Reminder Time",
+                                    ),
+                                    validator: (reminderNumber) {
+                                      if (reminderNumber != '') {
+                                        int intReminderNumber = int.parse(
+                                            reminderNumber.toString());
+                                        if (dropdownValue == 'days') {
+                                          if (intReminderNumber < 1 ||
+                                              intReminderNumber > 28) {
+                                            return 'Between 1 and 28 days';
+                                          } else {
+                                            return null;
+                                          }
+                                        } else if (dropdownValue == 'weeks') {
+                                          if (intReminderNumber < 1 ||
+                                              intReminderNumber > 4) {
+                                            return 'Between 1 to 4 weeks';
+                                          } else {
+                                            return null;
+                                          }
+                                        } else if (dropdownValue == 'hours') {
+                                          if (intReminderNumber < 1 ||
+                                              intReminderNumber > 24) {
+                                            return 'Between 1 to 23 hours';
+                                          } else {
+                                            return null;
+                                          }
+                                        }
+                                      } else {
+                                        return 'Please enter the field';
+                                      }
+                                    }),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: DropdownButtonFormField(
+                                    icon: const Icon(Icons.keyboard_arrow_down),
+                                    value: dropdownValue,
+                                    onChanged: ((value) {
+                                      setState(() {
+                                        dropdownValue = value.toString();
+                                      });
+                                    }),
+                                    items: listItems.map((item) {
+                                      return DropdownMenuItem(
+                                          value: item, child: Text(item));
+                                    }).toList()),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -493,6 +657,7 @@ class _CalendarPageState extends State<CalendarApp> {
                     FlatButton(
                       child: const Text("Cancel"),
                       onPressed: () {
+                        clearData();
                         Navigator.of(context).pop();
                       },
                     ),
