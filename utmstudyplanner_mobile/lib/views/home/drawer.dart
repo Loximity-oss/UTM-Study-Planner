@@ -74,6 +74,7 @@ class DefAppBar extends StatelessWidget {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SubjectListHomepageAA()));
               } else {
+                print('e');
                 Navigator.pop(context);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SubjectListHomepageStudent()));

@@ -139,7 +139,8 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
         "'"+ subjectSectionNumber.text +"', "
         "'"+ subjectCreditHours.text +"', "
         "'"+ maxStudents.text +"', "
-        "'0')";
+        "'0', ";
+        "'"+ semester.text +"')";
     print(query);
     try {
       var result = await db.execQuery(query);
@@ -731,8 +732,8 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (_semester) {
                         if(_semester == null || _semester.isEmpty){
-                          return 'Lecturer Name cannot be empty.';
-                        } else if (_semester.trim().length > 100){
+                          return 'Semester cannot be empty.';
+                        } else if (_semester.trim().length > 9){
                           return 'Max. 9 Characters.';
                         } else {
                           return null;

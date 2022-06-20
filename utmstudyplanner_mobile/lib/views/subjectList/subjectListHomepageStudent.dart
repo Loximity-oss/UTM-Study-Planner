@@ -49,12 +49,75 @@ class SubjectListHomepageStudentState
     });
   }
 
+  _addSubject(SubjectList SubjectList) async{
+
+    //compare
+    try{
+      if((SubjectList.currentStudents + 1) > SubjectList.maxStudents){
+        throw 'Max. Student Registered';
+      } else {
+        String query = "INSERT INTO `subjecttaken` (`subjectTakenID`, `matricID`, `subjectID`) VALUES "
+            "(NULL, "
+            "'" + box.get('matricID') +"', "
+            "'" + SubjectList.id.toString() +"');";
+
+        String query2 = "\nUPDATE `subjectlist` SET `currentStudents` = '" + (SubjectList.currentStudents + 1).toString() +"' WHERE `subjectlist`.`subjectID` = "
+            "'" + SubjectList.id.toString() +"';";
+        print(query);
+        print(query2);
+
+        var result = await db.execQuery(query);
+        var result2 = await db.execQuery(query2);
+
+        if (result.affectedRows.toInt() == 1 && result2.affectedRows.toInt() == 1) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Subject Added'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: const Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          throw 'Error';
+        }
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+  }
+
   _getEmployees() async {
     _showProgress('Loading Tables...');
     String query =
-        "SELECT * FROM `subjectlist` JOIN `subjecttaken` ON `subjectlist`.`subjectID` = `subjecttaken`.`subjectID` AND `subjecttaken`.`matricID` = '" +
+        "SELECT * FROM subjectlist LEFT OUTER JOIN subjecttaken ON subjectlist.subjectID = subjecttaken.subjectID AND subjecttaken.matricID = '" +
             box.get('matricID') +
-            "'";
+            "' WHERE subjectlist.subjectID AND subjecttaken.matricID IS NULL";
+    print(query);
     try {
       List<SubjectList> a = [];
       var result = await db.execQuery(query);
@@ -74,7 +137,9 @@ class SubjectListHomepageStudentState
             int.parse(row.colAt(11)!),
             int.parse(row.colAt(12)!),
             int.parse(row.colAt(13)!),
-            row.colAt(14)!);
+            row.colAt(15)!,
+            int.parse(row.colAt(14)!),
+        );
         a.add(b);
       }
       setState(() {
@@ -102,69 +167,17 @@ class SubjectListHomepageStudentState
     }
   }
 
-  _deleteEmployee(SubjectList SubjectList) async {
-    _showProgress('Deleting SubjectList...');
-    String query =
-        'DELETE FROM `subjectlist` WHERE `subjectlist`.`subjectID` = ' +
-            SubjectList.id.toString();
-    try {
-      var result = await db.execQuery(query);
-      if (result.affectedRows.toInt() == 1) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Successfully deleted.'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text("OK"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                    _getEmployees();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        throw 'Course does not exist.';
-      }
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(e.toString()),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
-  // Method to clear TextField values
-  _clearValues() {
-    _searchBox.text = '';
-  }
-
   _searchForm() async {
     print(_searchBox.text);
     if (_searchBox.text == '') {
       _getEmployees();
     } else {
       String query =
-          'SELECT * FROM `subjectlist` WHERE `subjectCourseCode` LIKE "' +
+          "SELECT * FROM subjectlist LEFT OUTER JOIN subjecttaken ON subjectlist.subjectID = subjecttaken.subjectID AND subjecttaken.matricID = '" +
+              box.get('matricID') +
+              "' WHERE subjectlist.subjectID AND subjecttaken.matricID IS NULL AND `subjectCourseCode` LIKE '" +
               _searchBox.text +
-              '%"';
+              "%'";
       print(query);
       try {
         List<SubjectList> a = [];
@@ -185,7 +198,8 @@ class SubjectListHomepageStudentState
               int.parse(row.colAt(11)!),
               int.parse(row.colAt(12)!),
               int.parse(row.colAt(13)!),
-            row.colAt(14)!
+              row.colAt(14)!,
+              int.parse(row.colAt(15)!),
           );
           a.add(b);
         }
@@ -225,8 +239,6 @@ class SubjectListHomepageStudentState
               SubjectList.subjectSectionNumber.toString()),
           content: Text('\nSubject ID : ' +
               SubjectList.id.toString() +
-              '\n\nSubject Name : ' +
-              SubjectList.subjectName +
               '\n\nSubject Course Code : ' +
               SubjectList.subjectCourseCode +
               '\n\nSubject Course Type : ' +
@@ -250,17 +262,15 @@ class SubjectListHomepageStudentState
               '\n\nSubject Credit Hours. : ' +
               SubjectList.subjectCreditHours.toString() +
               '\n\nSubject Max Students. : ' +
-              SubjectList.maxStudents.toString()),
+              SubjectList.maxStudents.toString() +
+              '\n\nSubject Current Students. : ' +
+              SubjectList.currentStudents.toString()),
+
           actions: <Widget>[
             FlatButton(
-              child: const Text("Edit"),
+              child: const Text("Yes"),
               onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => editSubjectList_AA_UI(
-                            editSubjectList: SubjectList)));
+                _addSubject(SubjectList);
               },
             ),
             FlatButton(
@@ -292,7 +302,10 @@ class SubjectListHomepageStudentState
               label: Text('Section'),
             ),
             DataColumn(
-              label: Text('Actions'),
+              label: Text('Current'),
+            ),
+            DataColumn(
+              label: Text('Max. Cap'),
             )
           ],
           rows: SubjectLists.map(
@@ -335,33 +348,32 @@ class SubjectListHomepageStudentState
                   });
                 },
               ),
-              DataCell(IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Confirm Deletion?'),
-                        actions: <Widget>[
-                          FlatButton(
-                            child: const Text("Yes"),
-                            onPressed: () {
-                              _deleteEmployee(SubjectList);
-                            },
-                          ),
-                          FlatButton(
-                            child: const Text("No"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
+              DataCell(
+                Text(
+                  SubjectList.currentStudents.toString(),
+                ),
+                onTap: () {
+                  _showValues(SubjectList);
+                  // Set the Selected SubjectList to Update
+                  _selectedEmployee = SubjectList;
+                  setState(() {
+                    _isUpdating = true;
+                  });
                 },
-              ))
+              ),
+              DataCell(
+                Text(
+                  SubjectList.maxStudents.toString(),
+                ),
+                onTap: () {
+                  _showValues(SubjectList);
+                  // Set the Selected SubjectList to Update
+                  _selectedEmployee = SubjectList;
+                  setState(() {
+                    _isUpdating = true;
+                  });
+                },
+              ),
             ]),
           ).toList(),
         ),

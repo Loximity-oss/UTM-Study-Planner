@@ -45,27 +45,27 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
     _getEmployees();
   }
 
-  _semesterConfiguration(){
+  _semesterConfiguration() {
     final DateTime now = DateTime.now();
     final DateFormat formatter1 = DateFormat("MM");
     String currentMonth = formatter1.format(now);
 
     //find q2 and q1
-    if(int.parse(currentMonth) > DateTime.september ) {
+    if (int.parse(currentMonth) > DateTime.september) {
       //currentYear 2023, new 202320241
       final DateTime currentYear = DateTime(now.year + 1);
       final DateTime lastYear = DateTime(now.year);
       final DateFormat formatter = DateFormat('yyyy');
       semester =
           formatter.format(lastYear) + formatter.format(currentYear) + '1';
-    } else if (int.parse(currentMonth) < DateTime.september){
+    } else if (int.parse(currentMonth) < DateTime.september) {
       //currentYear 2023, new 202220232
       final DateTime currentYear = DateTime(now.year);
       final DateTime lastYear = DateTime(now.year - 1);
       final DateFormat formatter = DateFormat('yyyy');
-      semester = formatter.format(lastYear) + formatter.format(currentYear) + '2';
+      semester =
+          formatter.format(lastYear) + formatter.format(currentYear) + '2';
     }
-
   }
 
   // Method to update title in the AppBar Title
@@ -77,28 +77,31 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
 
   _getEmployees() async {
     _showProgress('Loading Tables...');
-    String query = 'SELECT * FROM `subjectlist` WHERE `semester` = "' + semester + '"';
+    String query =
+        'SELECT * FROM `subjectlist` WHERE `semester` = "' + semester + '"';
     print(query);
     try {
       List<SubjectList> a = [];
       var result = await db.execQuery(query);
       for (final row in result.rows) {
         SubjectList b = SubjectList(
-            int.parse(row.colAt(0)!),
-            row.colAt(1)!,
-            row.colAt(2)!,
-            row.colAt(3)!,
-            row.colAt(4)!,
-            int.parse(row.colAt(5)!),
-            int.parse(row.colAt(6)!),
-            row.colAt(7)!,
-            int.parse(row.colAt(8)!),
-            int.parse(row.colAt(9)!),
-            row.colAt(10)!,
-            int.parse(row.colAt(11)!),
-            int.parse(row.colAt(12)!),
-            int.parse(row.colAt(13)!),
-            row.colAt(14)!);
+          int.parse(row.colAt(0)!),
+          row.colAt(1)!,
+          row.colAt(2)!,
+          row.colAt(3)!,
+          row.colAt(4)!,
+          int.parse(row.colAt(5)!),
+          int.parse(row.colAt(6)!),
+          row.colAt(7)!,
+          int.parse(row.colAt(8)!),
+          int.parse(row.colAt(9)!),
+          row.colAt(10)!,
+          int.parse(row.colAt(11)!),
+          int.parse(row.colAt(12)!),
+          int.parse(row.colAt(13)!),
+          row.colAt(14)!,
+          int.parse(row.colAt(15)!),
+        );
         a.add(b);
       }
       setState(() {
@@ -195,21 +198,23 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
         var result = await db.execQuery(query);
         for (final row in result.rows) {
           SubjectList b = SubjectList(
-              int.parse(row.colAt(0)!),
-              row.colAt(1)!,
-              row.colAt(2)!,
-              row.colAt(3)!,
-              row.colAt(4)!,
-              int.parse(row.colAt(5)!),
-              int.parse(row.colAt(6)!),
-              row.colAt(7)!,
-              int.parse(row.colAt(8)!),
-              int.parse(row.colAt(9)!),
-              row.colAt(10)!,
-              int.parse(row.colAt(11)!),
-              int.parse(row.colAt(12)!),
-              int.parse(row.colAt(13)!),
-              row.colAt(14)!);
+            int.parse(row.colAt(0)!),
+            row.colAt(1)!,
+            row.colAt(2)!,
+            row.colAt(3)!,
+            row.colAt(4)!,
+            int.parse(row.colAt(5)!),
+            int.parse(row.colAt(6)!),
+            row.colAt(7)!,
+            int.parse(row.colAt(8)!),
+            int.parse(row.colAt(9)!),
+            row.colAt(10)!,
+            int.parse(row.colAt(11)!),
+            int.parse(row.colAt(12)!),
+            int.parse(row.colAt(13)!),
+            row.colAt(14)!,
+            int.parse(row.colAt(15)!),
+          );
           a.add(b);
         }
         setState(() {

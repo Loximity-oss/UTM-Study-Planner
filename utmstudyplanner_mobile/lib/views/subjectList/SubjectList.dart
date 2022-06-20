@@ -13,6 +13,7 @@ class SubjectList {
   int subjectSectionNumber;
   int subjectCreditHours;
   int maxStudents;
+  int currentStudents;
   String semester;
 
   SubjectList(
@@ -30,5 +31,6 @@ class SubjectList {
       this.subjectSectionNumber,
       this.subjectCreditHours,
       this.maxStudents,
-      this.semester);
+      this.semester,
+      this.currentStudents);
 }
