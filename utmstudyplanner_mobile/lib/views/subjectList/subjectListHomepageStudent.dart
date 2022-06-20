@@ -198,8 +198,8 @@ class SubjectListHomepageStudentState
               int.parse(row.colAt(11)!),
               int.parse(row.colAt(12)!),
               int.parse(row.colAt(13)!),
-              row.colAt(14)!,
-              int.parse(row.colAt(15)!),
+              row.colAt(15)!,
+              int.parse(row.colAt(14)!),
           );
           a.add(b);
         }

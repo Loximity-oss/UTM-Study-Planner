@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:utmstudyplanner_mobile/views/home/drawer.dart';
 import '../../../server/conn.dart';
 import '../calendar/Meeting.dart';
 
@@ -17,6 +17,9 @@ class _TimetablePageState extends State<Timetable>{
   final DateTime today = DateTime.now();
   late DateTime firstDayOfTheWeek;
   late DateTime lastDayOfTheWeek;
+  MeetingDataSource? events;
+  final box = Hive.box('');
+
 
   @override
   void initState(){
@@ -30,9 +33,33 @@ class _TimetablePageState extends State<Timetable>{
     firstDayOfTheWeek = today.subtract(Duration(days: weekDay));
     lastDayOfTheWeek = today.subtract(Duration(days: weekDay - 5));
   }
-  
-  _getEmployees() async {
 
+  Future<void> getData() async {
+    //list to send to dataSource
+    List<Meeting> meetings = <Meeting>[];
+    var db = Mysql();
+    String query = 'SELECT * FROM `event` WHERE `matricID` = "' +
+        box.get("matricID") +
+        '"';
+    try {
+      var result = await db.execQuery(query);
+
+
+      for (final row in result.rows) {
+        meetings.add(Meeting(
+            row.colByName("eventName")!,
+            DateTime.parse(row.colByName("fromEvent")!),
+            DateTime.parse(row.colByName("toEvent")!),
+            Color(int.parse(row.colByName("background")!)),
+            false,
+            int.parse(row.colByName("eventID")!)));
+      }
+      setState(() {
+        events = MeetingDataSource(meetings);
+      });
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
