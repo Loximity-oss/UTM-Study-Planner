@@ -85,7 +85,7 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
       var result = await db.execQuery(query);
       for (final row in result.rows) {
         SubjectList b = SubjectList(
-          int.parse(row.colAt(0)!),
+          row.colAt(0)!,
           row.colAt(1)!,
           row.colAt(2)!,
           row.colAt(3)!,
@@ -99,8 +99,8 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
           int.parse(row.colAt(11)!),
           int.parse(row.colAt(12)!),
           int.parse(row.colAt(13)!),
-          row.colAt(14)!,
-          int.parse(row.colAt(15)!),
+          row.colAt(15)!,
+          int.parse(row.colAt(14)!),
         );
         a.add(b);
       }
@@ -198,7 +198,7 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
         var result = await db.execQuery(query);
         for (final row in result.rows) {
           SubjectList b = SubjectList(
-            int.parse(row.colAt(0)!),
+            row.colAt(0)!,
             row.colAt(1)!,
             row.colAt(2)!,
             row.colAt(3)!,
@@ -212,9 +212,10 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
             int.parse(row.colAt(11)!),
             int.parse(row.colAt(12)!),
             int.parse(row.colAt(13)!),
-            row.colAt(14)!,
-            int.parse(row.colAt(15)!),
+            row.colAt(15)!,
+            int.parse(row.colAt(14)!),
           );
+          print(row.colAt(14));
           a.add(b);
         }
         setState(() {

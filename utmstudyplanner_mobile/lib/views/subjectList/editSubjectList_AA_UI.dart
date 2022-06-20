@@ -77,6 +77,8 @@ class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
     subjectLecturer.text = widget.editSubjectList.subjectLecturer;
     subjectSectionNumber.text = widget.editSubjectList.subjectSectionNumber.toString();
     subjectCreditHours.text = widget.editSubjectList.subjectCreditHours.toString();
+    maxStudents.text = widget.editSubjectList.maxStudents.toString();
+    semester.text = widget.editSubjectList.semester.toString();
     super.initState();
   }
 
@@ -112,8 +114,11 @@ class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
   }
 
   editSubject() async{
+    String id_alt = subjectCourseCode.text + subjectSectionNumber.text;
+
     var db = Mysql();
     String query = "UPDATE `subjectlist` SET "
+        "`subjectID` = '"+ id_alt +"', "
         "`subjectName` = '"+ subjectName.text +"', "
         "`subjectCourseCode` = '"+ subjectCourseCode.text +"', "
         "`subjectCourseType` = '"+ subjectCourseType.text +"', "

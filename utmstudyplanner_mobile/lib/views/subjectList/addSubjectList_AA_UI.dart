@@ -65,11 +65,11 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
   @override
   void initState() {
     subjectDay.text = "MON";
-    subjectStartTime.text = "1";
-    subjectEndTime.text = "2";
+    subjectStartTime.text = "6";
+    subjectEndTime.text = "7";
     subjectDay_1.text = "MON";
-    subjectStartTime_1.text = "1";
-    subjectEndTime_1.text = "2";
+    subjectStartTime_1.text = "6";
+    subjectEndTime_1.text = "7";
     subjectCourseType.text = "1";
 
     super.initState();
@@ -107,25 +107,10 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
   }
 
   addSubject() async{
+    String id = subjectCourseCode.text + subjectSectionNumber.text;
     var db = Mysql();
-    String query = "INSERT INTO `subjectlist` "
-        "(`subjectID`, "
-        "`subjectName`, "
-        "`subjectCourseCode`, "
-        "`subjectCourseType`, "
-        "`subjectDay`, "
-        "`subjectStartTime`, "
-        "`subjectEndTime`, "
-        "`subjectDay_1`, "
-        "`subjectStartTime_1`, "
-        "`subjectEndTime_1`, "
-        "`subjectLecturer`, "
-        "`subjectSectionNumber`, "
-        "`subjectCreditHours` , "
-        "`maxStudents`, "
-        "`currentStudents` "
-        ") VALUES "
-        "(NULL, "
+    String query = "INSERT INTO `subjectlist` (`subjectID`, `subjectName`, `subjectCourseCode`, `subjectCourseType`, `subjectDay`, `subjectStartTime`, `subjectEndTime`, `subjectDay_1`, `subjectStartTime_1`, `subjectEndTime_1`, `subjectLecturer`, `subjectSectionNumber`, `subjectCreditHours`, `maxStudents`, `currentStudents`, `semester`) VALUES "
+        "('"+ id +"', "
         "'"+ subjectName.text +"', "
         "'"+ subjectCourseCode.text +"', "
         "'"+ subjectCourseType.text +"', "
@@ -139,7 +124,7 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
         "'"+ subjectSectionNumber.text +"', "
         "'"+ subjectCreditHours.text +"', "
         "'"+ maxStudents.text +"', "
-        "'0', ";
+        "'0' ,"
         "'"+ semester.text +"')";
     print(query);
     try {

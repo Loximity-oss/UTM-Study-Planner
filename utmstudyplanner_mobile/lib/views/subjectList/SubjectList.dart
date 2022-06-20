@@ -1,5 +1,5 @@
 class SubjectList {
-  int id;
+  String id;
   String subjectName;
   String subjectCourseCode;
   String subjectCourseType;

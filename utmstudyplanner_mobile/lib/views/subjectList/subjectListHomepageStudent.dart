@@ -80,6 +80,8 @@ class SubjectListHomepageStudentState
                     child: const Text("OK"),
                     onPressed: () {
                       Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      _getEmployees();
                     },
                   ),
                 ],
@@ -123,7 +125,7 @@ class SubjectListHomepageStudentState
       var result = await db.execQuery(query);
       for (final row in result.rows) {
         SubjectList b = SubjectList(
-            int.parse(row.colAt(0)!),
+            row.colAt(0)!,
             row.colAt(1)!,
             row.colAt(2)!,
             row.colAt(3)!,
@@ -184,7 +186,7 @@ class SubjectListHomepageStudentState
         var result = await db.execQuery(query);
         for (final row in result.rows) {
           SubjectList b = SubjectList(
-              int.parse(row.colAt(0)!),
+              row.colAt(0)!,
               row.colAt(1)!,
               row.colAt(2)!,
               row.colAt(3)!,
@@ -268,7 +270,7 @@ class SubjectListHomepageStudentState
 
           actions: <Widget>[
             FlatButton(
-              child: const Text("Yes"),
+              child: const Text("Add"),
               onPressed: () {
                 _addSubject(SubjectList);
               },
@@ -311,7 +313,7 @@ class SubjectListHomepageStudentState
           rows: SubjectLists.map(
             (SubjectList) => DataRow(cells: [
               DataCell(
-                Text(SubjectList.id.toString()),
+                Text(SubjectList.id),
                 // Add tap in the row and populate the
                 // textfields with the corresponding values to update
                 onTap: () {

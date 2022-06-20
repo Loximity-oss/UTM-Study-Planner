@@ -32,13 +32,18 @@ class _TimetablePageState extends State<Timetable>{
 
     firstDayOfTheWeek = today.subtract(Duration(days: weekDay));
     lastDayOfTheWeek = today.subtract(Duration(days: weekDay - 5));
+    print(firstDayOfTheWeek);
+    print(lastDayOfTheWeek);
+
   }
 
   Future<void> getData() async {
+
+
     //list to send to dataSource
     List<Meeting> meetings = <Meeting>[];
     var db = Mysql();
-    String query = 'SELECT * FROM `event` WHERE `matricID` = "' +
+    String query = 'SELECT * FROM `subjectlist` JOIN `subjecttaken` ON `subjectlist`.`subjectID` = `subjecttaken`.`subjectID` AND `subjecttaken`.`matricID` =  "' +
         box.get("matricID") +
         '"';
     try {
@@ -46,8 +51,9 @@ class _TimetablePageState extends State<Timetable>{
 
 
       for (final row in result.rows) {
+        print(firstDayOfTheWeek);
         meetings.add(Meeting(
-            row.colByName("eventName")!,
+            row.colAt(2)!,
             DateTime.parse(row.colByName("fromEvent")!),
             DateTime.parse(row.colByName("toEvent")!),
             Color(int.parse(row.colByName("background")!)),
@@ -74,7 +80,7 @@ class _TimetablePageState extends State<Timetable>{
         controller: _calendarController,
         timeSlotViewSettings: const TimeSlotViewSettings(
           startHour: 6,
-          endHour: 18,
+          endHour: 19,
           nonWorkingDays: <int>[DateTime.friday, DateTime.saturday],
           timeIntervalHeight: -1,
           timeIntervalWidth: -1,
