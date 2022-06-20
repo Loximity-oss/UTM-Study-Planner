@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/subjectList/addSubjectList_AA_UI.dart';
 import 'package:utmstudyplanner_mobile/views/subjectList/editSubjectList_AA_UI.dart';
 
 import '../../server/conn.dart';
 import 'SubjectList.dart';
 
-class SubjectListHomepageAA extends StatefulWidget {
+class SubjectListHomepageStudent extends StatefulWidget {
   //
-  SubjectListHomepageAA() : super();
-
-  final String title = 'Flutter Data Table';
+  SubjectListHomepageStudent() : super();
 
   @override
-  SubjectListHomepageAAState createState() => SubjectListHomepageAAState();
+  SubjectListHomepageStudentState createState() =>
+      SubjectListHomepageStudentState();
 }
 
-class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
+class SubjectListHomepageStudentState
+    extends State<SubjectListHomepageStudent> {
+  final box = Hive.box('');
   late List<SubjectList> SubjectLists;
   late GlobalKey<ScaffoldState> _scaffoldKey;
   late TextEditingController _searchBox;
@@ -24,7 +25,6 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
   late bool _isUpdating;
   late String _titleProgress;
   var db = Mysql();
-  late String semester;
 
   //form keys
   final _formSearchKey = GlobalKey<FormState>();
@@ -33,39 +33,13 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
   void initState() {
     super.initState();
     SubjectLists = [];
-    semester = "";
-    _semesterConfiguration();
     _isUpdating = false;
-    _titleProgress = widget.title;
     _scaffoldKey = GlobalKey(); // key to get the context to show a SnackBar
     _searchBox = TextEditingController();
     _searchBox.addListener(() {
       _searchForm();
     });
     _getEmployees();
-  }
-
-  _semesterConfiguration(){
-    final DateTime now = DateTime.now();
-    final DateFormat formatter1 = DateFormat("MM");
-    String currentMonth = formatter1.format(now);
-
-    //find q2 and q1
-    if(int.parse(currentMonth) > DateTime.september ) {
-      //currentYear 2023, new 202320241
-      final DateTime currentYear = DateTime(now.year + 1);
-      final DateTime lastYear = DateTime(now.year);
-      final DateFormat formatter = DateFormat('yyyy');
-      semester =
-          formatter.format(lastYear) + formatter.format(currentYear) + '1';
-    } else if (int.parse(currentMonth) < DateTime.september){
-      //currentYear 2023, new 202220232
-      final DateTime currentYear = DateTime(now.year);
-      final DateTime lastYear = DateTime(now.year - 1);
-      final DateFormat formatter = DateFormat('yyyy');
-      semester = formatter.format(lastYear) + formatter.format(currentYear) + '2';
-    }
-
   }
 
   // Method to update title in the AppBar Title
@@ -77,8 +51,10 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
 
   _getEmployees() async {
     _showProgress('Loading Tables...');
-    String query = 'SELECT * FROM `subjectlist` WHERE `semester` = "' + semester + '"';
-    print(query);
+    String query =
+        "SELECT * FROM `subjectlist` JOIN `subjecttaken` ON `subjectlist`.`subjectID` = `subjecttaken`.`subjectID` AND `subjecttaken`.`matricID` = '" +
+            box.get('matricID') +
+            "'";
     try {
       List<SubjectList> a = [];
       var result = await db.execQuery(query);
@@ -209,7 +185,8 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
               int.parse(row.colAt(11)!),
               int.parse(row.colAt(12)!),
               int.parse(row.colAt(13)!),
-              row.colAt(14)!);
+            row.colAt(14)!
+          );
           a.add(b);
         }
         setState(() {
@@ -445,17 +422,6 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
             child: _dataBody(),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => addSubjectList_AA_UI()),
-          );
-          ;
-        },
-        backgroundColor: Colors.blueGrey,
-        child: const Icon(Icons.add),
       ),
     );
   }

@@ -12,21 +12,31 @@ class Timetable extends StatefulWidget{
 }
 
 class _TimetablePageState extends State<Timetable>{
+  DateTime currentTime = DateTime.now();
+  DateTime _firstDayOfTheweek = DateTime.now();
+
+
+  @override
+  void initstate(){
+    g
+    super.initState();
+  }
+
+  _getEmployees() async {
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: DefAppBar(),
       appBar: AppBar(
         title: const Text('Timetable'),
         backgroundColor: const Color.fromRGBO(93, 6, 29, 1.0),
       ),
       body: SfCalendar(
+        allowViewNavigation: false,
         view: CalendarView.week,
-        timeSlotViewSettings: const TimeSlotViewSettings(
-          startHour: 6,
-          endHour: 18,
-        ),
+        minDate: _firstDayOfTheweek,
       ),
     );
   }

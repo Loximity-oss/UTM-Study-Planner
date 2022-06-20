@@ -12,6 +12,8 @@ class SubjectList {
   String subjectLecturer;
   int subjectSectionNumber;
   int subjectCreditHours;
+  int maxStudents;
+  String semester;
 
   SubjectList(
       this.id,
@@ -26,5 +28,7 @@ class SubjectList {
       this.subjectEndTime_1,
       this.subjectLecturer,
       this.subjectSectionNumber,
-      this.subjectCreditHours);
+      this.subjectCreditHours,
+      this.maxStudents,
+      this.semester);
 }

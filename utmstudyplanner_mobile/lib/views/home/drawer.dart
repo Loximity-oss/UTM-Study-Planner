@@ -5,6 +5,7 @@ import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
 import 'package:utmstudyplanner_mobile/views/home/profilev2.dart';
 import 'package:utmstudyplanner_mobile/views/home/timetable/timetable_homescreen.dart';
 import 'package:utmstudyplanner_mobile/views/subjectList/subjectListHomepageAA.dart';
+import 'package:utmstudyplanner_mobile/views/subjectList/subjectListHomepageStudent.dart';
 import '../login/login.dart';
 import 'calendar/calendarv2.dart';
 
@@ -68,9 +69,15 @@ class DefAppBar extends StatelessWidget {
             leading: const FaIcon(FontAwesomeIcons.list, color: Colors.black),
             title: const Text('Subject List'),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SubjectListHomepageAA()));
+              if(box.get('matricID') == '5203'){
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SubjectListHomepageAA()));
+              } else {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SubjectListHomepageStudent()));
+              }
             },
           ),
 

@@ -109,7 +109,7 @@ class _homepageState extends State<homepage>{
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Container(child: Text(box.get('nickname'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), )), //TODO: link with backend
                         Container(child: Text(box.get('matricID'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
                         Container(child: Text(box.get('coursecode'),textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 11,),)),
