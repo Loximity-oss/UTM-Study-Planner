@@ -18,6 +18,7 @@ class addSubjectList_AA_UI extends StatefulWidget {
 
 class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
   final List<String> _days = [
+    "N/A",
     "MON",
     "TUE",
     "WED",
@@ -28,6 +29,7 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
   ];
 
   final List<String> _time = [
+    "0",
     "6",
     "7",
     "8",
@@ -680,14 +682,14 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
                           ),
                           filled: true,
                           hintStyle: TextStyle(color: Colors.grey[800]),
-                          hintText: "Max Students",
+                          hintText: "Max Students. e.g. 01,02,31",
                           fillColor: Colors.white),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (_creditHours) {
-                        if(_creditHours == null || _creditHours.isEmpty){
+                      validator: (_maxStudents) {
+                        if(_maxStudents == null || _maxStudents.isEmpty){
                           return 'Max Students cannot be empty.';
-                        } else if (_creditHours.trim().length > 2){
-                          return 'Max Students 2 chars.';
+                        } else if (_maxStudents.trim().length > 2 || _maxStudents.trim().length < 2){
+                          return 'Max/Min Students 2 chars. e.g 01,02,31';
                         } else {
                           return null;
                         }
@@ -712,7 +714,7 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
                           ),
                           filled: true,
                           hintStyle: TextStyle(color: Colors.grey[800]),
-                          hintText: "Lecturer Name",
+                          hintText: "Semester",
                           fillColor: Colors.white),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (_semester) {
@@ -727,9 +729,7 @@ class addSubjectList_AA_UIState extends State<addSubjectList_AA_UI> {
 
                     ),
 
-
                     const SizedBox(height: 30),
-
                     Container(
                       width: MediaQuery.of(context).size.width / 2.0,
                       height: 40,

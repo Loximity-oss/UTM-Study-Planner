@@ -10,7 +10,7 @@ class SubjectList {
   int subjectStartTime_1;
   int subjectEndTime_1;
   String subjectLecturer;
-  int subjectSectionNumber;
+  String subjectSectionNumber;
   int subjectCreditHours;
   int maxStudents;
   int currentStudents;

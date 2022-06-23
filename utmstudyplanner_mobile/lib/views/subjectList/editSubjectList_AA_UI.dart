@@ -18,6 +18,7 @@ class editSubjectList_AA_UI extends StatefulWidget {
 
 class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
   final List<String> _days = [
+    "N/A",
     "MON",
     "TUE",
     "WED",
@@ -28,6 +29,7 @@ class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
   ];
 
   final List<String> _time = [
+    "0",
     "6",
     "7",
     "8",
@@ -75,7 +77,7 @@ class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
     subjectStartTime_1.text = widget.editSubjectList.subjectStartTime_1.toString();
     subjectEndTime_1.text = widget.editSubjectList.subjectEndTime_1.toString();
     subjectLecturer.text = widget.editSubjectList.subjectLecturer;
-    subjectSectionNumber.text = widget.editSubjectList.subjectSectionNumber.toString();
+    subjectSectionNumber.text = widget.editSubjectList.subjectSectionNumber;
     subjectCreditHours.text = widget.editSubjectList.subjectCreditHours.toString();
     maxStudents.text = widget.editSubjectList.maxStudents.toString();
     semester.text = widget.editSubjectList.semester.toString();
@@ -131,6 +133,7 @@ class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
         "`subjectLecturer` = '"+ subjectLecturer.text +"', "
         "`subjectSectionNumber` = '"+ subjectSectionNumber.text +"', "
         "`subjectCreditHours` = '"+ subjectCreditHours.text +"' ,"
+        "`semester` = '"+ semester.text +"' ,"
         "`maxStudents` = '"+ maxStudents.text +"' "
         "WHERE `subjectlist`.`subjectID` = '"+ id.text +"'";
 
@@ -148,6 +151,7 @@ class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
                 FlatButton(
                   child: const Text("OK"),
                   onPressed: () {
+                    Navigator.of(context).pop();
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();
                     Navigator.push(context,
@@ -689,14 +693,14 @@ class editSubjectList_AA_UIState extends State<editSubjectList_AA_UI> {
                           ),
                           filled: true,
                           hintStyle: TextStyle(color: Colors.grey[800]),
-                          hintText: "Max Students",
+                          hintText: "Max Students. e.g. 01,02,31",
                           fillColor: Colors.white),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (_creditHours) {
-                        if(_creditHours == null || _creditHours.isEmpty){
+                      validator: (_maxStudents) {
+                        if(_maxStudents == null || _maxStudents.isEmpty){
                           return 'Max Students cannot be empty.';
-                        } else if (_creditHours.trim().length > 2){
-                          return 'Max Students 2 chars.';
+                        } else if (_maxStudents.trim().length > 2 || _maxStudents.trim().length < 2){
+                          return 'Max/Min Students 2 chars. e.g 01,02,31';
                         } else {
                           return null;
                         }

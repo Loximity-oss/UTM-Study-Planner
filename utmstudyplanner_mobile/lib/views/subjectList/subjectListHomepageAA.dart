@@ -77,6 +77,7 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
 
   _getEmployees() async {
     _showProgress('Loading Tables...');
+    semester = '20220231';
     String query =
         'SELECT * FROM `subjectlist` WHERE `semester` = "' + semester + '"';
     print(query);
@@ -96,7 +97,7 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
           int.parse(row.colAt(8)!),
           int.parse(row.colAt(9)!),
           row.colAt(10)!,
-          int.parse(row.colAt(11)!),
+          row.colAt(11)!,
           int.parse(row.colAt(12)!),
           int.parse(row.colAt(13)!),
           row.colAt(15)!,
@@ -209,7 +210,7 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
             int.parse(row.colAt(8)!),
             int.parse(row.colAt(9)!),
             row.colAt(10)!,
-            int.parse(row.colAt(11)!),
+            row.colAt(11)!,
             int.parse(row.colAt(12)!),
             int.parse(row.colAt(13)!),
             row.colAt(15)!,
@@ -310,6 +311,7 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
+          columnSpacing: 40.0,
           columns: const [
             DataColumn(
               label: Text('ID'),

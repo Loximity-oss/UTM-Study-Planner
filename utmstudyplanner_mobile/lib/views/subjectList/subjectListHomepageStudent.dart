@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/subjectList/addSubjectList_AA_UI.dart';
 import 'package:utmstudyplanner_mobile/views/subjectList/editSubjectList_AA_UI.dart';
 
 import '../../server/conn.dart';
+import '../home/homescreen.dart';
 import 'SubjectList.dart';
 
 class SubjectListHomepageStudent extends StatefulWidget {
@@ -49,27 +51,37 @@ class SubjectListHomepageStudentState
     });
   }
 
-  _addSubject(SubjectList SubjectList) async{
-
+  _addSubject(SubjectList SubjectList) async {
     //compare
-    try{
-      if((SubjectList.currentStudents + 1) > SubjectList.maxStudents){
+    try {
+      if ((SubjectList.currentStudents + 1) > SubjectList.maxStudents) {
         throw 'Max. Student Registered';
       } else {
-        String query = "INSERT INTO `subjecttaken` (`subjectTakenID`, `matricID`, `subjectID`) VALUES "
-            "(NULL, "
-            "'" + box.get('matricID') +"', "
-            "'" + SubjectList.id.toString() +"');";
+        String query =
+            "INSERT INTO `subjecttaken` (`subjectTakenID`, `matricID`, `subjectID`, `subjectCourseCode`) VALUES "
+                    "(NULL, "
+                    "'" +
+                box.get('matricID') +
+                "', '" +
+                SubjectList.id.toString() +
+                "', '" +
+                SubjectList.subjectCourseCode +
+                "');";
 
-        String query2 = "\nUPDATE `subjectlist` SET `currentStudents` = '" + (SubjectList.currentStudents + 1).toString() +"' WHERE `subjectlist`.`subjectID` = "
-            "'" + SubjectList.id.toString() +"';";
+        String query2 = "\nUPDATE `subjectlist` SET `currentStudents` = '" +
+            (SubjectList.currentStudents + 1).toString() +
+            "' WHERE `subjectlist`.`subjectID` = "
+                "'" +
+            SubjectList.id.toString() +
+            "';";
         print(query);
         print(query2);
 
         var result = await db.execQuery(query);
         var result2 = await db.execQuery(query2);
 
-        if (result.affectedRows.toInt() == 1 && result2.affectedRows.toInt() == 1) {
+        if (result.affectedRows.toInt() == 1 &&
+            result2.affectedRows.toInt() == 1) {
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -110,37 +122,36 @@ class SubjectListHomepageStudentState
         },
       );
     }
-
   }
 
   _getEmployees() async {
     _showProgress('Loading Tables...');
     String query =
-        "SELECT * FROM subjectlist LEFT OUTER JOIN subjecttaken ON subjectlist.subjectID = subjecttaken.subjectID AND subjecttaken.matricID = '" +
+        "SELECT * FROM subjectlist LEFT OUTER JOIN subjecttaken ON subjectlist.subjectCourseCode = subjecttaken.subjectCourseCode AND subjecttaken.matricID = '" +
             box.get('matricID') +
-            "' WHERE subjectlist.subjectID AND subjecttaken.matricID IS NULL";
+            "' WHERE subjecttaken.matricID IS NULL LIMIT 30";
     print(query);
     try {
       List<SubjectList> a = [];
       var result = await db.execQuery(query);
       for (final row in result.rows) {
         SubjectList b = SubjectList(
-            row.colAt(0)!,
-            row.colAt(1)!,
-            row.colAt(2)!,
-            row.colAt(3)!,
-            row.colAt(4)!,
-            int.parse(row.colAt(5)!),
-            int.parse(row.colAt(6)!),
-            row.colAt(7)!,
-            int.parse(row.colAt(8)!),
-            int.parse(row.colAt(9)!),
-            row.colAt(10)!,
-            int.parse(row.colAt(11)!),
-            int.parse(row.colAt(12)!),
-            int.parse(row.colAt(13)!),
-            row.colAt(15)!,
-            int.parse(row.colAt(14)!),
+          row.colAt(0)!,
+          row.colAt(1)!,
+          row.colAt(2)!,
+          row.colAt(3)!,
+          row.colAt(4)!,
+          int.parse(row.colAt(5)!),
+          int.parse(row.colAt(6)!),
+          row.colAt(7)!,
+          int.parse(row.colAt(8)!),
+          int.parse(row.colAt(9)!),
+          row.colAt(10)!,
+          row.colAt(11)!,
+          int.parse(row.colAt(12)!),
+          int.parse(row.colAt(13)!),
+          row.colAt(15)!,
+          int.parse(row.colAt(14)!),
         );
         a.add(b);
       }
@@ -175,9 +186,9 @@ class SubjectListHomepageStudentState
       _getEmployees();
     } else {
       String query =
-          "SELECT * FROM subjectlist LEFT OUTER JOIN subjecttaken ON subjectlist.subjectID = subjecttaken.subjectID AND subjecttaken.matricID = '" +
+          "SELECT * FROM subjectlist LEFT OUTER JOIN subjecttaken ON subjectlist.subjectCourseCode = subjecttaken.subjectCourseCode AND subjecttaken.matricID = '" +
               box.get('matricID') +
-              "' WHERE subjectlist.subjectID AND subjecttaken.matricID IS NULL AND `subjectCourseCode` LIKE '" +
+              "' WHERE subjecttaken.matricID IS NULL AND subjectlist.subjectCourseCode LIKE '" +
               _searchBox.text +
               "%'";
       print(query);
@@ -186,22 +197,22 @@ class SubjectListHomepageStudentState
         var result = await db.execQuery(query);
         for (final row in result.rows) {
           SubjectList b = SubjectList(
-              row.colAt(0)!,
-              row.colAt(1)!,
-              row.colAt(2)!,
-              row.colAt(3)!,
-              row.colAt(4)!,
-              int.parse(row.colAt(5)!),
-              int.parse(row.colAt(6)!),
-              row.colAt(7)!,
-              int.parse(row.colAt(8)!),
-              int.parse(row.colAt(9)!),
-              row.colAt(10)!,
-              int.parse(row.colAt(11)!),
-              int.parse(row.colAt(12)!),
-              int.parse(row.colAt(13)!),
-              row.colAt(15)!,
-              int.parse(row.colAt(14)!),
+            row.colAt(0)!,
+            row.colAt(1)!,
+            row.colAt(2)!,
+            row.colAt(3)!,
+            row.colAt(4)!,
+            int.parse(row.colAt(5)!),
+            int.parse(row.colAt(6)!),
+            row.colAt(7)!,
+            int.parse(row.colAt(8)!),
+            int.parse(row.colAt(9)!),
+            row.colAt(10)!,
+            row.colAt(11)!,
+            int.parse(row.colAt(12)!),
+            int.parse(row.colAt(13)!),
+            row.colAt(15)!,
+            int.parse(row.colAt(14)!),
           );
           a.add(b);
         }
@@ -267,7 +278,6 @@ class SubjectListHomepageStudentState
               SubjectList.maxStudents.toString() +
               '\n\nSubject Current Students. : ' +
               SubjectList.currentStudents.toString()),
-
           actions: <Widget>[
             FlatButton(
               child: const Text("Add"),
@@ -293,10 +303,8 @@ class SubjectListHomepageStudentState
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
+          columnSpacing: 40.0,
           columns: const [
-            DataColumn(
-              label: Text('ID'),
-            ),
             DataColumn(
               label: Text('Subject Code'),
             ),
@@ -304,7 +312,7 @@ class SubjectListHomepageStudentState
               label: Text('Section'),
             ),
             DataColumn(
-              label: Text('Current'),
+              label: Text('Registered'),
             ),
             DataColumn(
               label: Text('Max. Cap'),
@@ -312,19 +320,6 @@ class SubjectListHomepageStudentState
           ],
           rows: SubjectLists.map(
             (SubjectList) => DataRow(cells: [
-              DataCell(
-                Text(SubjectList.id),
-                // Add tap in the row and populate the
-                // textfields with the corresponding values to update
-                onTap: () {
-                  _showValues(SubjectList);
-                  // Set the Selected SubjectList to Update
-                  _selectedEmployee = SubjectList;
-                  setState(() {
-                    _isUpdating = true;
-                  });
-                },
-              ),
               DataCell(
                 Text(SubjectList.subjectCourseCode),
                 onTap: () {
@@ -383,59 +378,70 @@ class SubjectListHomepageStudentState
     );
   }
 
+  Future<bool> _onWillPop() async {
+    Navigator.of(context).pop(false);
+    Navigator.of(context).pop(false);
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const homepage()));
+    return false;
+  }
+
   // UI
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 93, 6, 29),
-        iconTheme: (const IconThemeData(color: Colors.white)),
-        title: Text(_titleProgress),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              _getEmployees();
-            },
-          )
-        ],
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Form(
-            key: _formSearchKey,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextFormField(
-                enableSuggestions: false,
-                autocorrect: false,
-                controller: _searchBox,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: const BorderSide(
-                      width: 1,
-                      style: BorderStyle.none,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 93, 6, 29),
+          iconTheme: (const IconThemeData(color: Colors.white)),
+          title: Text(_titleProgress),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                _getEmployees();
+              },
+            )
+          ],
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Form(
+              key: _formSearchKey,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: TextFormField(
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  controller: _searchBox,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(
+                        width: 0,
+                        style: BorderStyle.none,
+                      ),
                     ),
+                    filled: true,
+                    hintStyle: TextStyle(color: Colors.grey[800]),
+                    hintText: "Search by Subject Code...",
+                    fillColor: Colors.white,
                   ),
-                  filled: true,
-                  hintStyle: TextStyle(color: Colors.grey[800]),
-                  hintText: "Search by Subject Code...",
-                  fillColor: Colors.white,
                 ),
               ),
             ),
-          ),
 
-          // Add an update button and a Cancel Button
-          // show these buttons only when updating an SubjectList
+            // Add an update button and a Cancel Button
+            // show these buttons only when updating an SubjectList
 
-          Expanded(
-            child: _dataBody(),
-          ),
-        ],
+            Expanded(
+              child: _dataBody(),
+            ),
+          ],
+        ),
       ),
     );
   }

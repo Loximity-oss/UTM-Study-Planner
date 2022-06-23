@@ -60,21 +60,39 @@ class DefAppBar extends StatelessWidget {
             leading: const FaIcon(FontAwesomeIcons.timeline, color: Colors.black),
             title: const Text('Timetable'),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Timetable()));
+              if(box.get('coursecode') == 'LECTURER'){
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('You are not a student.'),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: const Text("OK"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Timetable()));
+              }
             },
           ),
           ListTile(
             leading: const FaIcon(FontAwesomeIcons.list, color: Colors.black),
             title: const Text('Subject List'),
             onTap: () {
-              if(box.get('matricID') == '5203'){
+              if(box.get('coursecode') == 'LECTURER'){
                 Navigator.pop(context);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SubjectListHomepageAA()));
               } else {
-                print('e');
                 Navigator.pop(context);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SubjectListHomepageStudent()));
