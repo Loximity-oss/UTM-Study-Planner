@@ -99,10 +99,21 @@ class LocalNotifyManager {
       DateTime dt = DateTime.parse(scheduleNotificationDateTime);
 
       if (dt.compareTo(DateTime.now()) > 0) {
+        var dateType = row.colByName('reminder_date');
+        var reminderNumber = int.parse(row.colByName('reminder_number')!);
+
+        if (dateType == "hours") {
+          dt = dt.add(Duration(minutes: reminderNumber));
+        } else if (dateType == "days") {
+          dt = dt.add(Duration(days: reminderNumber));
+        } else if (dateType == "weeks") {
+          dt = dt.add(Duration(days: reminderNumber * 7));
+        }
+
         await flutterLocalNotificationsPlugin.schedule(
-            int.parse(row.colByName('eventID').toString()),
+            int.parse(row.colByName('eventID')!),
             row.colByName('eventName'),
-            '',
+            null,
             dt,
             platformChannel,
             payload: 'New Payload');

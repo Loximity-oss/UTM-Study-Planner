@@ -23,6 +23,8 @@ class MeetingAdapter extends TypeAdapter<Meeting> {
       fields[4] as Color,
       fields[5] as bool,
       fields[0] as int,
+      fields[6] as int,
+      fields[7] as String,
     );
   }
 
