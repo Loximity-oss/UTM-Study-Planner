@@ -40,16 +40,16 @@ class _registerPageState extends State<registerPage> {
     String img64;
 
     //Prepare Query
-    String query = 'INSERT INTO `users` (`id`, `email`, `name`, `coursecode`, `password`, `password_2`, `password_3`, `profilePicture`, `verificationStatus`) VALUES ("'
+    String query = 'INSERT INTO `users` (`id`, `email`, `name`, `coursecode`, `password`, `password_2`, `password_3`, `profilePicture`, `verificationStatus`, `accountType`) VALUES ("'
         + inputID + '","' + inputEmail + '","' + inputName + '","' + inputCourse + '","' + inputPassword + '", "-", "-", ';
 
     //Then append to query str.
     if(_image != null){
       final bytes = _image?.readAsBytesSync();
       img64 = base64Encode(bytes!);
-      query = query +  '"' + img64 + '", 0)';
+      query = query +  '"' + img64 + '", 0  , "0")';
     } else {
-      query = query + 'NULL, 0)';
+      query = query + 'NULL, 0 , "0")';
     }
 
     print(query);

@@ -3,6 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:utmstudyplanner_mobile/views/home/homescreen.dart';
 import 'package:utmstudyplanner_mobile/views/home/profilev2.dart';
+import 'package:utmstudyplanner_mobile/views/home/timetable/timetable_homescreen.dart';
+import 'package:utmstudyplanner_mobile/views/subjectList/subjectListHomepageAA.dart';
+import 'package:utmstudyplanner_mobile/views/subjectList/subjectListHomepageStudent.dart';
 import '../login/login.dart';
 import 'calendar/calendarv2.dart';
 
@@ -54,13 +57,49 @@ class DefAppBar extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const FaIcon(FontAwesomeIcons.gear, color: Colors.black),
-            title: const Text('Settings'),
+            leading: const FaIcon(FontAwesomeIcons.timeline, color: Colors.black),
+            title: const Text('Timetable'),
             onTap: () {
-              // Update the state of the app.
-              // ...
+              if(box.get('coursecode') == 'LECTURER'){
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('You are not a student.'),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: const Text("OK"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Timetable()));
+              }
             },
           ),
+          ListTile(
+            leading: const FaIcon(FontAwesomeIcons.list, color: Colors.black),
+            title: const Text('Subject List'),
+            onTap: () {
+              if(box.get('coursecode') == 'LECTURER'){
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SubjectListHomepageAA()));
+              } else {
+                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SubjectListHomepageStudent()));
+              }
+            },
+          ),
+
           Container(
             child: Align(
                 alignment: FractionalOffset.bottomCenter,
@@ -86,6 +125,7 @@ class DefAppBar extends StatelessWidget {
                                         box.put('nickname', '');
                                         box.put('matricID', '');
                                         box.put('coursecode', '');
+                                        box.put('accountType', '');
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(

@@ -29,7 +29,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
 
     //check if cleared.
-    //TODO corruption check
     if(a.isNotEmpty && b.isNotEmpty){
       var db = Mysql();
       String query = 'SELECT `email`, `password` FROM `users` WHERE `email` = "'+ a +'" AND password = "' + b + '"';
@@ -38,6 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
       
       //todo shorten
       if(result.numOfRows == 1){
+        print('e');
         Timer(const Duration(seconds: 5),
                 ()=>Navigator.pushReplacement(context,
                 MaterialPageRoute(builder:
@@ -48,7 +48,6 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         box.put('email', '');
         box.put('password', '');
-
         box.put('nickname', '');
         box.put('matricID','');
         box.put('image','');

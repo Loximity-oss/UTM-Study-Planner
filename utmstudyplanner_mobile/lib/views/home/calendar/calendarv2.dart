@@ -17,7 +17,6 @@ class CalendarApp extends StatefulWidget {
   const CalendarApp({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _CalendarPageState createState() => _CalendarPageState();
 }
 

@@ -43,7 +43,7 @@ class _loginPageState extends State<loginPage> {
     try {
       var db = Mysql();
       String query =
-          'SELECT `id`,`email`, `name`, `coursecode`, `password`, `verificationStatus` FROM `users` WHERE `email` = "' +
+          'SELECT `id`,`email`, `name`, `coursecode`, `password`, `verificationStatus`, `accountType` FROM `users` WHERE `email` = "' +
               email +
               '" AND `password` = "' +
               password +
@@ -83,6 +83,7 @@ class _loginPageState extends State<loginPage> {
             box.put('nickname', row.colAt(2));
             box.put('matricID', row.colAt(0));
             box.put('coursecode', row.colAt(3));
+            box.put('accountType', row.colAt(6));
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const homepage()));
           }

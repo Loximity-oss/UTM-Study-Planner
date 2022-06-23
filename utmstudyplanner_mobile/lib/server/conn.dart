@@ -26,4 +26,5 @@ class Mysql {
       rethrow;
     }
   }
+
 }
