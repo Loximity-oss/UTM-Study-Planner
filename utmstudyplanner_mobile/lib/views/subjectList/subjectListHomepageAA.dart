@@ -133,8 +133,9 @@ class SubjectListHomepageAAState extends State<SubjectListHomepageAA> {
   _deleteEmployee(SubjectList SubjectList) async {
     _showProgress('Deleting SubjectList...');
     String query =
-        'DELETE FROM `subjectlist` WHERE `subjectlist`.`subjectID` = ' +
-            SubjectList.id.toString();
+        'DELETE FROM `subjectlist` WHERE `subjectlist`.`subjectID` = "' +
+            SubjectList.id.toString() + '"';
+    print(query);
     try {
       var result = await db.execQuery(query);
       if (result.affectedRows.toInt() == 1) {

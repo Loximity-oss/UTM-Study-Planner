@@ -4,10 +4,10 @@ import 'package:hive/hive.dart';
 part 'Meeting.g.dart';
 
 @HiveType(typeId: 0)
-class Meeting{
-
+class Meeting {
   /// Creates a meeting class with required details.
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay, this.id);
+  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay,
+      this.id, this.reminderNumber, this.dateType);
 
   /// Event ID
   @HiveField(0)
@@ -33,4 +33,9 @@ class Meeting{
   @HiveField(5)
   bool isAllDay;
 
+  @HiveField(6)
+  int reminderNumber;
+
+  @HiveField(7)
+  String dateType;
 }
